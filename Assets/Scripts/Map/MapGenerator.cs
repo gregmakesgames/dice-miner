@@ -4,6 +4,8 @@ using UnityEngine;
 
 public sealed class MapGenerator : MonoBehaviour
 {
+    public const string PLAYER_SPAWN_ID = "player_spawn";
+
     [Header("Map Size")]
     [SerializeField] private int width = 30;
     [SerializeField] private int height = 30;
@@ -24,6 +26,10 @@ public sealed class MapGenerator : MonoBehaviour
     [SerializeField] private Transform tilesParent;
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private FieldEntity fieldEntityPrefab;
+
+    [Header("Player")]
+    [SerializeField] private Transform player;
+    [SerializeField] private CameraFollow cameraFollow;
 
     [Header("Pooling")]
     [SerializeField] private int poolDefaultCapacity = 256;
@@ -111,6 +117,9 @@ public sealed class MapGenerator : MonoBehaviour
             ReleaseActiveFieldEntities();
         }
 
+        Vector3 playerSpawnLocalPos = Vector3.zero;
+        bool hasPlayerSpawn = false;
+
         for (int y = 0; y < validatedHeight; y++)
         {
             for (int x = 0; x < validatedWidth; x++)
@@ -127,19 +136,54 @@ public sealed class MapGenerator : MonoBehaviour
                 }
 
                 ConfigEntity fieldEntityConfig = dungeon.PickFieldEntity(x, y);
-                if (fieldEntityConfig != null && hasFieldEntityPrefab)
+                if (fieldEntityConfig == null)
+                {
+                    continue;
+                }
+
+                if (fieldEntityConfig.Id == PLAYER_SPAWN_ID)
+                {
+                    playerSpawnLocalPos = localPos;
+                    hasPlayerSpawn = true;
+                    continue;
+                }
+
+                if (hasFieldEntityPrefab)
                 {
                     FieldEntity entity = fieldEntityPool.Get();
                     entity.name = $"FieldEntity_{x}_{y}_{fieldEntityConfig.Id}";
                     entity.transform.localPosition = localPos;
                     entity.Init(fieldEntityConfig, ReleaseFieldEntity);
                 }
-                else if (fieldEntityConfig != null)
+                else
                 {
                     Debug.LogWarning(
                         $"MapGenerator: FieldEntity '{fieldEntityConfig.Id}' was scheduled at ({x},{y}) but fieldEntityPrefab is not assigned.");
                 }
             }
+        }
+
+        if (hasPlayerSpawn)
+        {
+            PositionPlayerAt(playerSpawnLocalPos);
+        }
+    }
+
+    private void PositionPlayerAt(Vector3 localPos)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        Transform parent = ResolveTilesParent();
+        Vector3 worldPos = parent.TransformPoint(localPos);
+        worldPos.z = player.position.z;
+        player.position = worldPos;
+
+        if (cameraFollow != null)
+        {
+            cameraFollow.SnapTo(player);
         }
     }
 
