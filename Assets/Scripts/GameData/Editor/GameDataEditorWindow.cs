@@ -159,7 +159,7 @@ public sealed class GameDataEditorWindow : EditorWindow
 
             EditorGUILayout.LabelField("Type Definition", EditorStyles.boldLabel);
             string oldTypeName = type.name;
-            string newTypeName = EditorGUILayout.TextField("Type Name", type.name);
+            string newTypeName = EditorGUILayout.DelayedTextField("Type Name", type.name);
             if (newTypeName != oldTypeName && !string.IsNullOrWhiteSpace(newTypeName))
             {
                 type.name = newTypeName.Trim();
@@ -199,7 +199,7 @@ public sealed class GameDataEditorWindow : EditorWindow
             using (new EditorGUILayout.HorizontalScope())
             {
                 string oldFieldName = field.name;
-                string newFieldName = EditorGUILayout.TextField("Name", field.name);
+                string newFieldName = EditorGUILayout.DelayedTextField("Name", field.name);
                 if (newFieldName != oldFieldName && !string.IsNullOrWhiteSpace(newFieldName))
                 {
                     field.name = newFieldName.Trim();
@@ -358,7 +358,7 @@ public sealed class GameDataEditorWindow : EditorWindow
     private void DrawEntityIdEditor(string typeName, JObject entity)
     {
         string oldId = entity.Value<string>("id") ?? string.Empty;
-        string newId = EditorGUILayout.TextField("id", oldId);
+        string newId = EditorGUILayout.DelayedTextField("id", oldId);
         if (newId == oldId || string.IsNullOrWhiteSpace(newId))
         {
             return;
@@ -412,13 +412,13 @@ public sealed class GameDataEditorWindow : EditorWindow
         switch (field.type)
         {
             case GameDataFieldType.Int:
-                return new JValue(EditorGUILayout.IntField(field.name, token?.Value<int>() ?? 0));
+                return new JValue(EditorGUILayout.DelayedIntField(field.name, token?.Value<int>() ?? 0));
             case GameDataFieldType.Float:
-                return new JValue(EditorGUILayout.FloatField(field.name, token?.Value<float>() ?? 0f));
+                return new JValue(EditorGUILayout.DelayedFloatField(field.name, token?.Value<float>() ?? 0f));
             case GameDataFieldType.Bool:
                 return new JValue(EditorGUILayout.Toggle(field.name, token?.Value<bool>() ?? false));
             case GameDataFieldType.String:
-                return new JValue(EditorGUILayout.TextField(field.name, token?.Value<string>() ?? string.Empty));
+                return new JValue(EditorGUILayout.DelayedTextField(field.name, token?.Value<string>() ?? string.Empty));
             case GameDataFieldType.Vector2:
             {
                 Vector2 vec = new(

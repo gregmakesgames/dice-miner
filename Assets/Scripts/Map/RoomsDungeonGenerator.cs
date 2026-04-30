@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public sealed class RoomsDungeonGenerator : IDungeonGenerator
@@ -10,6 +11,9 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     private const string AnyFamily = "any";
     private const string PlacementUnderneath = "underneath";
     private const string PlacementReplace = "replace";
+    private const string RolePlayerSpawn = "playerSpawn";
+    private const string RoleExit = "exit";
+    private const int PlayerSpawnClearRadius = 1; // 3x3 area: center +/- 1
     private const int RoomPlacementRetries = 32;
 
     private enum Category
@@ -27,6 +31,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     private Category[,] grid;
     private ConfigEntity[,] fieldEntities;
     private bool[,] tileRemoved;
+    private List<RectInt> rooms;
     private int gridWidth;
     private int gridHeight;
     private bool ready;
@@ -57,6 +62,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         grid = null;
         fieldEntities = null;
         tileRemoved = null;
+        rooms = null;
         gridWidth = Mathf.Max(0, width);
         gridHeight = Mathf.Max(0, height);
 
@@ -139,13 +145,13 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
             return null;
         }
 
-        return fieldEntities[y, x];
+        return fieldEntities[x, y];
     }
 
     private void BuildLayout(System.Random rng)
     {
         grid = new Category[gridHeight, gridWidth];
-        fieldEntities = new ConfigEntity[gridHeight, gridWidth];
+        fieldEntities = new ConfigEntity[gridWidth, gridHeight];
         tileRemoved = new bool[gridHeight, gridWidth];
         bool[,] carved = new bool[gridHeight, gridWidth];
 
@@ -162,8 +168,8 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
             grid[y, gridWidth - 1] = Category.Outline;
         }
 
-        List<RectInt> placedRooms = PlaceRooms(rng, carved);
-        ConnectRooms(rng, placedRooms, carved);
+        rooms = PlaceRooms(rng, carved);
+        ConnectRooms(rng, rooms, carved);
         StampWalls(carved);
     }
 
@@ -174,12 +180,26 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
             return;
         }
 
+        ConfigEntity playerSpawnConfig = fieldEntityConfigs.First(x => x.Id == "player_spawn");
+        ConfigEntity exitConfig = fieldEntityConfigs.First(x => x.Id == "exit");
+
+        int spawnRoomIndex = -1;
+        spawnRoomIndex = PlacePlayerSpawn(rng, playerSpawnConfig);
+
+        PlaceExit(exitConfig, spawnRoomIndex);
+
         List<Vector2Int> candidates = new();
 
         for (int i = 0; i < fieldEntityConfigs.Count; i++)
         {
             ConfigEntity entity = fieldEntityConfigs[i];
             if (entity == null)
+            {
+                continue;
+            }
+
+            string role = entity.GetString("role");
+            if (!string.IsNullOrEmpty(role))
             {
                 continue;
             }
@@ -209,13 +229,94 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
                 (candidates[p], candidates[pickIndex]) = (candidates[pickIndex], candidates[p]);
 
                 Vector2Int cell = candidates[p];
-                fieldEntities[cell.y, cell.x] = entity;
+                fieldEntities[cell.x, cell.y] = entity;
                 if (replace)
                 {
                     tileRemoved[cell.y, cell.x] = true;
                 }
             }
         }
+    }
+
+    private int PlacePlayerSpawn(System.Random rng, ConfigEntity config)
+    {
+        if (rooms == null || rooms.Count == 0)
+        {
+            Debug.LogWarning(
+                "RoomsDungeonGenerator: cannot place player spawn - no rooms were generated.");
+            return -1;
+        }
+
+        int roomIndex = rng.Next(0, rooms.Count);
+        RectInt room = rooms[roomIndex];
+        Vector2Int center = RoomCenter(room);
+
+        // Clamp the 3x3 clearing inside the room so we never punch holes through
+        // the surrounding wall ring even if the room is exactly minimum size.
+        int x0 = Mathf.Max(center.x - PlayerSpawnClearRadius, room.xMin);
+        int y0 = Mathf.Max(center.y - PlayerSpawnClearRadius, room.yMin);
+        int x1 = Mathf.Min(center.x + PlayerSpawnClearRadius, room.xMax - 1);
+        int y1 = Mathf.Min(center.y + PlayerSpawnClearRadius, room.yMax - 1);
+
+        for (int y = y0; y <= y1; y++)
+        {
+            for (int x = x0; x <= x1; x++)
+            {
+                tileRemoved[y, x] = true;
+                fieldEntities[x, y] = null;
+            }
+        }
+
+        fieldEntities[center.x, center.y] = config;
+        return roomIndex;
+    }
+
+    private void PlaceExit(ConfigEntity config, int spawnRoomIndex)
+    {
+        if (rooms == null || rooms.Count == 0)
+        {
+            Debug.LogWarning(
+                "RoomsDungeonGenerator: cannot place exit - no rooms were generated.");
+            return;
+        }
+
+        if (rooms.Count < 2 && spawnRoomIndex >= 0)
+        {
+            Debug.LogWarning(
+                "RoomsDungeonGenerator: cannot place exit at least 1 room away - only one room was generated.");
+            return;
+        }
+
+        // Pick the room with the greatest chain distance from the spawn room.
+        // Rooms are connected sequentially by ConnectRooms, so |i - spawn| is a
+        // reasonable proxy for "rooms between us".
+        int exitRoomIndex = -1;
+        int bestDistance = -1;
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (i == spawnRoomIndex)
+            {
+                continue;
+            }
+
+            int distance = spawnRoomIndex >= 0 ? Mathf.Abs(i - spawnRoomIndex) : i;
+            if (distance > bestDistance)
+            {
+                bestDistance = distance;
+                exitRoomIndex = i;
+            }
+        }
+
+        if (exitRoomIndex < 0)
+        {
+            return;
+        }
+
+        RectInt room = rooms[exitRoomIndex];
+        Vector2Int center = RoomCenter(room);
+
+        
+        fieldEntities[center.x, center.y] = config;
     }
 
     private void CollectCandidates(string allowedFamily, List<Vector2Int> output)
@@ -232,7 +333,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         {
             for (int x = 0; x < gridWidth; x++)
             {
-                if (fieldEntities[y, x] != null || tileRemoved[y, x])
+                if (fieldEntities[x, y] != null || tileRemoved[y, x])
                 {
                     continue;
                 }

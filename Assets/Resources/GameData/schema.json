@@ -39,26 +39,6 @@
           "refType": ""
         },
         {
-          "name": "healthMin",
-          "type": 0,
-          "refType": ""
-        },
-        {
-          "name": "healthMax",
-          "type": 0,
-          "refType": ""
-        },
-        {
-          "name": "hittableLevelMin",
-          "type": 0,
-          "refType": ""
-        },
-        {
-          "name": "placement",
-          "type": 3,
-          "refType": ""
-        },
-        {
           "name": "allowedTileFamily",
           "type": 3,
           "refType": ""
@@ -74,8 +54,18 @@
           "refType": ""
         },
         {
-          "name": "weight",
-          "type": 1,
+          "name": "isReplace",
+          "type": 2,
+          "refType": ""
+        },
+        {
+          "name": "isUnderneath",
+          "type": 2,
+          "refType": ""
+        },
+        {
+          "name": "size",
+          "type": 4,
           "refType": ""
         }
       ]

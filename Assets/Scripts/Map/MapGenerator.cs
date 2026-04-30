@@ -132,7 +132,7 @@ public sealed class MapGenerator : MonoBehaviour
                     FieldEntity entity = fieldEntityPool.Get();
                     entity.name = $"FieldEntity_{x}_{y}_{fieldEntityConfig.Id}";
                     entity.transform.localPosition = localPos;
-                    entity.Init(fieldEntityConfig, RollHealth(fieldEntityConfig), ReleaseFieldEntity);
+                    entity.Init(fieldEntityConfig, ReleaseFieldEntity);
                 }
                 else if (fieldEntityConfig != null)
                 {

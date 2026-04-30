@@ -160,8 +160,11 @@ MonoBehaviour:
   generateOnStart: 1
   tilesParent: {fileID: 39387970}
   tilePrefab: {fileID: 3678915945961844360, guid: c41eb87b66143407d9e01cef6a996b73, type: 3}
+  fieldEntityPrefab: {fileID: 8439653471908466572, guid: 2ccd100c53e2546599464af7c0608453, type: 3}
   poolDefaultCapacity: 256
   poolMaxSize: 4096
+  fieldEntityPoolDefaultCapacity: 64
+  fieldEntityPoolMaxSize: 1024
 --- !u!4 &39387970
 Transform:
   m_ObjectHideFlags: 0

@@ -4,24 +4,24 @@
       {
         "id": "earth",
         "sprite": "Sprites/Tiles/Earth",
-        "healthMin": 10,
-        "healthMax": 20,
+        "healthMin": 1,
+        "healthMax": 6,
         "hittableLevelMin": 1,
         "family": "filler"
       },
       {
         "id": "stone",
         "sprite": "Sprites/Tiles/Stone",
-        "healthMin": 20,
-        "healthMax": 35,
+        "healthMin": 1,
+        "healthMax": 6,
         "hittableLevelMin": 1,
         "family": "filler"
       },
       {
         "id": "limestone",
         "sprite": "Sprites/Tiles/Limestone",
-        "healthMin": 25,
-        "healthMax": 40,
+        "healthMin": 2,
+        "healthMax": 8,
         "hittableLevelMin": 2,
         "family": "filler"
       },
@@ -68,16 +68,30 @@
     ],
     "FieldEntity": [
       {
-        "id": "chest",
+        "id": "player_spawn",
         "sprite": "",
-        "healthMin": 1,
-        "healthMax": 1,
-        "hittableLevelMin": 1,
-        "placement": "underneath",
-        "allowedTileFamily": "filler",
-        "spawnCountMin": 2,
-        "spawnCountMax": 4,
-        "weight": 1
+        "allowedTileFamily": "",
+        "spawnCountMin": 0,
+        "spawnCountMax": 0,
+        "isReplace": false,
+        "isUnderneath": false,
+        "size": {
+          "x": 1.0,
+          "y": 1.0
+        }
+      },
+      {
+        "id": "exit",
+        "sprite": "",
+        "allowedTileFamily": "",
+        "spawnCountMin": 0,
+        "spawnCountMax": 0,
+        "isReplace": false,
+        "isUnderneath": false,
+        "size": {
+          "x": 2.0,
+          "y": 2.0
+        }
       }
     ],
     "Upgrade": []
