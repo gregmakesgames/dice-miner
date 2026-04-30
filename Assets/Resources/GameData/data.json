@@ -1,41 +1,5 @@
 {
   "configs": {
-    "EnemyShip": [
-      {
-        "id": "shark",
-        "displayName": "Shark Boat",
-        "speed": 4.5,
-        "armor": 2,
-        "spawnOffset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 2.0
-        },
-        "tintColor": {
-          "r": 1.0,
-          "g": 0.2,
-          "b": 0.2,
-          "a": 1.0
-        },
-        "movement": "fast"
-      }
-    ],
-    "ShipMovement": [
-      {
-        "id": "fast",
-        "label": "Fast Profile",
-        "maxSpeed": 6.5
-      }
-    ],
-    "Test": [
-      {
-        "id": "new_entity",
-        "newField": "",
-        "newField1": "",
-        "newField2": "",
-        "newField3": "shark"
-      }
-    ],
     "TileType": [
       {
         "id": "earth",

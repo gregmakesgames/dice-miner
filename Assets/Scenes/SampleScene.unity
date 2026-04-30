@@ -156,6 +156,9 @@ MonoBehaviour:
   seed: 12345
   generateOnStart: 1
   tilesParent: {fileID: 39387970}
+  tilePrefab: {fileID: 3678915945961844360, guid: c41eb87b66143407d9e01cef6a996b73, type: 3}
+  poolDefaultCapacity: 256
+  poolMaxSize: 4096
 --- !u!4 &39387970
 Transform:
   m_ObjectHideFlags: 0
