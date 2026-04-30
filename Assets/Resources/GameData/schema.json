@@ -31,6 +31,56 @@
       ]
     },
     {
+      "name": "FieldEntity",
+      "fields": [
+        {
+          "name": "sprite",
+          "type": 8,
+          "refType": ""
+        },
+        {
+          "name": "healthMin",
+          "type": 0,
+          "refType": ""
+        },
+        {
+          "name": "healthMax",
+          "type": 0,
+          "refType": ""
+        },
+        {
+          "name": "hittableLevelMin",
+          "type": 0,
+          "refType": ""
+        },
+        {
+          "name": "placement",
+          "type": 3,
+          "refType": ""
+        },
+        {
+          "name": "allowedTileFamily",
+          "type": 3,
+          "refType": ""
+        },
+        {
+          "name": "spawnCountMin",
+          "type": 0,
+          "refType": ""
+        },
+        {
+          "name": "spawnCountMax",
+          "type": 0,
+          "refType": ""
+        },
+        {
+          "name": "weight",
+          "type": 1,
+          "refType": ""
+        }
+      ]
+    },
+    {
       "name": "Upgrade",
       "fields": [
         {

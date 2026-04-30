@@ -66,6 +66,20 @@
         "family": "outline"
       }
     ],
+    "FieldEntity": [
+      {
+        "id": "chest",
+        "sprite": "",
+        "healthMin": 1,
+        "healthMax": 1,
+        "hittableLevelMin": 1,
+        "placement": "underneath",
+        "allowedTileFamily": "filler",
+        "spawnCountMin": 2,
+        "spawnCountMax": 4,
+        "weight": 1
+      }
+    ],
     "Upgrade": []
   }
 }

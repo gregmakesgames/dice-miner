@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class RoomsTileDistribution : ITileDistribution
+public sealed class RoomsDungeonGenerator : IDungeonGenerator
 {
     private const string WallFamily = "wall";
     private const string FillerFamily = "filler";
     private const string OutlineFamily = "outline";
+    private const string AnyFamily = "any";
+    private const string PlacementUnderneath = "underneath";
+    private const string PlacementReplace = "replace";
     private const int RoomPlacementRetries = 32;
 
     private enum Category
@@ -22,6 +25,8 @@ public sealed class RoomsTileDistribution : ITileDistribution
     private readonly int roomSizeMax;
 
     private Category[,] grid;
+    private ConfigEntity[,] fieldEntities;
+    private bool[,] tileRemoved;
     private int gridWidth;
     private int gridHeight;
     private bool ready;
@@ -30,7 +35,7 @@ public sealed class RoomsTileDistribution : ITileDistribution
     private ConfigEntity fillerTile;
     private ConfigEntity outlineTile;
 
-    public RoomsTileDistribution(int roomCountMin, int roomCountMax, int roomSizeMin, int roomSizeMax)
+    public RoomsDungeonGenerator(int roomCountMin, int roomCountMax, int roomSizeMin, int roomSizeMax)
     {
         this.roomCountMin = Mathf.Max(0, roomCountMin);
         this.roomCountMax = Mathf.Max(this.roomCountMin, roomCountMax);
@@ -38,13 +43,20 @@ public sealed class RoomsTileDistribution : ITileDistribution
         this.roomSizeMax = Mathf.Max(this.roomSizeMin, roomSizeMax);
     }
 
-    public void Initialize(IReadOnlyList<ConfigEntity> tileConfigs, int width, int height, System.Random random)
+    public void Initialize(
+        IReadOnlyList<ConfigEntity> tileConfigs,
+        IReadOnlyList<ConfigEntity> fieldEntityConfigs,
+        int width,
+        int height,
+        System.Random random)
     {
         ready = false;
         wallTile = null;
         fillerTile = null;
         outlineTile = null;
         grid = null;
+        fieldEntities = null;
+        tileRemoved = null;
         gridWidth = Mathf.Max(0, width);
         gridHeight = Mathf.Max(0, height);
 
@@ -85,7 +97,7 @@ public sealed class RoomsTileDistribution : ITileDistribution
         if (walls.Count == 0 || fillers.Count == 0 || outlines.Count == 0)
         {
             Debug.LogWarning(
-                "RoomsTileDistribution: missing tile configs. " +
+                "RoomsDungeonGenerator: missing tile configs. " +
                 $"Found walls={walls.Count}, fillers={fillers.Count}, outlines={outlines.Count}. " +
                 "Need at least one TileType per family ('wall', 'filler', 'outline').");
             return;
@@ -96,12 +108,18 @@ public sealed class RoomsTileDistribution : ITileDistribution
         outlineTile = outlines[rng.Next(0, outlines.Count)];
 
         BuildLayout(rng);
+        PlaceFieldEntities(rng, fieldEntityConfigs);
         ready = true;
     }
 
     public ConfigEntity PickTile(int x, int y)
     {
         if (!ready || grid == null || x < 0 || y < 0 || x >= gridWidth || y >= gridHeight)
+        {
+            return null;
+        }
+
+        if (tileRemoved != null && tileRemoved[y, x])
         {
             return null;
         }
@@ -114,9 +132,21 @@ public sealed class RoomsTileDistribution : ITileDistribution
         };
     }
 
+    public ConfigEntity PickFieldEntity(int x, int y)
+    {
+        if (!ready || fieldEntities == null || x < 0 || y < 0 || x >= gridWidth || y >= gridHeight)
+        {
+            return null;
+        }
+
+        return fieldEntities[y, x];
+    }
+
     private void BuildLayout(System.Random rng)
     {
         grid = new Category[gridHeight, gridWidth];
+        fieldEntities = new ConfigEntity[gridHeight, gridWidth];
+        tileRemoved = new bool[gridHeight, gridWidth];
         bool[,] carved = new bool[gridHeight, gridWidth];
 
         // Outer ring -> outline.
@@ -135,6 +165,92 @@ public sealed class RoomsTileDistribution : ITileDistribution
         List<RectInt> placedRooms = PlaceRooms(rng, carved);
         ConnectRooms(rng, placedRooms, carved);
         StampWalls(carved);
+    }
+
+    private void PlaceFieldEntities(System.Random rng, IReadOnlyList<ConfigEntity> fieldEntityConfigs)
+    {
+        if (fieldEntityConfigs == null || fieldEntityConfigs.Count == 0 || fieldEntities == null)
+        {
+            return;
+        }
+
+        List<Vector2Int> candidates = new();
+
+        for (int i = 0; i < fieldEntityConfigs.Count; i++)
+        {
+            ConfigEntity entity = fieldEntityConfigs[i];
+            if (entity == null)
+            {
+                continue;
+            }
+
+            int spawnMin = Mathf.Max(0, entity.GetInt("spawnCountMin"));
+            int spawnMax = Mathf.Max(spawnMin, entity.GetInt("spawnCountMax"));
+            int count = spawnMin == spawnMax ? spawnMin : rng.Next(spawnMin, spawnMax + 1);
+            if (count <= 0)
+            {
+                continue;
+            }
+
+            string allowedFamily = entity.GetString("allowedTileFamily");
+            string placement = entity.GetString("placement");
+            bool replace = string.Equals(placement, PlacementReplace, StringComparison.Ordinal);
+
+            CollectCandidates(allowedFamily, candidates);
+            if (candidates.Count == 0)
+            {
+                continue;
+            }
+
+            int placements = Mathf.Min(count, candidates.Count);
+            for (int p = 0; p < placements; p++)
+            {
+                int pickIndex = rng.Next(p, candidates.Count);
+                (candidates[p], candidates[pickIndex]) = (candidates[pickIndex], candidates[p]);
+
+                Vector2Int cell = candidates[p];
+                fieldEntities[cell.y, cell.x] = entity;
+                if (replace)
+                {
+                    tileRemoved[cell.y, cell.x] = true;
+                }
+            }
+        }
+    }
+
+    private void CollectCandidates(string allowedFamily, List<Vector2Int> output)
+    {
+        output.Clear();
+
+        bool any = string.IsNullOrEmpty(allowedFamily) ||
+                   string.Equals(allowedFamily, AnyFamily, StringComparison.Ordinal);
+        bool allowFiller = any || string.Equals(allowedFamily, FillerFamily, StringComparison.Ordinal);
+        bool allowWall = any || string.Equals(allowedFamily, WallFamily, StringComparison.Ordinal);
+        bool allowOutline = any || string.Equals(allowedFamily, OutlineFamily, StringComparison.Ordinal);
+
+        for (int y = 0; y < gridHeight; y++)
+        {
+            for (int x = 0; x < gridWidth; x++)
+            {
+                if (fieldEntities[y, x] != null || tileRemoved[y, x])
+                {
+                    continue;
+                }
+
+                bool match = grid[y, x] switch
+                {
+                    Category.Filler => allowFiller,
+                    Category.Wall => allowWall,
+                    Category.Outline => allowOutline,
+                    _ => false,
+                };
+
+                if (match)
+                {
+                    output.Add(new Vector2Int(x, y));
+                }
+            }
+        }
     }
 
     private List<RectInt> PlaceRooms(System.Random rng, bool[,] carved)

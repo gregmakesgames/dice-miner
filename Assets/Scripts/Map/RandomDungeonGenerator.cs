@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
 
-public sealed class RandomTileDistribution : ITileDistribution
+public sealed class RandomDungeonGenerator : IDungeonGenerator
 {
     private IReadOnlyList<ConfigEntity> tileConfigs = Array.Empty<ConfigEntity>();
     private Random random = new();
 
-    public void Initialize(IReadOnlyList<ConfigEntity> tileConfigs, int width, int height, Random random)
+    public void Initialize(
+        IReadOnlyList<ConfigEntity> tileConfigs,
+        IReadOnlyList<ConfigEntity> fieldEntityConfigs,
+        int width,
+        int height,
+        Random random)
     {
         this.tileConfigs = tileConfigs ?? Array.Empty<ConfigEntity>();
         this.random = random ?? new Random();
@@ -21,5 +26,10 @@ public sealed class RandomTileDistribution : ITileDistribution
 
         int index = random.Next(0, tileConfigs.Count);
         return tileConfigs[index];
+    }
+
+    public ConfigEntity PickFieldEntity(int x, int y)
+    {
+        return null;
     }
 }
