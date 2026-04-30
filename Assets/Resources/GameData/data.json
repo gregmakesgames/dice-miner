@@ -1,0 +1,99 @@
+{
+  "configs": {
+    "EnemyShip": [
+      {
+        "id": "shark",
+        "displayName": "Shark Boat",
+        "speed": 4.5,
+        "armor": 2,
+        "spawnOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 2.0
+        },
+        "tintColor": {
+          "r": 1.0,
+          "g": 0.2,
+          "b": 0.2,
+          "a": 1.0
+        },
+        "movement": "fast"
+      }
+    ],
+    "ShipMovement": [
+      {
+        "id": "fast",
+        "label": "Fast Profile",
+        "maxSpeed": 6.5
+      }
+    ],
+    "Test": [
+      {
+        "id": "new_entity",
+        "newField": "",
+        "newField1": "",
+        "newField2": "",
+        "newField3": "shark"
+      }
+    ],
+    "TileType": [
+      {
+        "id": "earth",
+        "sprite": "Sprites/Tiles/Earth",
+        "healthMin": 10,
+        "healthMax": 20,
+        "hittableLevelMin": 1
+      },
+      {
+        "id": "stone",
+        "sprite": "Sprites/Tiles/Stone",
+        "healthMin": 20,
+        "healthMax": 35,
+        "hittableLevelMin": 1
+      },
+      {
+        "id": "limestone",
+        "sprite": "Sprites/Tiles/Limestone",
+        "healthMin": 25,
+        "healthMax": 40,
+        "hittableLevelMin": 2
+      },
+      {
+        "id": "mossy_wall",
+        "sprite": "Sprites/Tiles/Mossy_Wall",
+        "healthMin": 30,
+        "healthMax": 45,
+        "hittableLevelMin": 2
+      },
+      {
+        "id": "stone_wall",
+        "sprite": "Sprites/Tiles/Stone_Wall",
+        "healthMin": 35,
+        "healthMax": 55,
+        "hittableLevelMin": 3
+      },
+      {
+        "id": "gold_vein",
+        "sprite": "Sprites/Tiles/Gold_Vein",
+        "healthMin": 40,
+        "healthMax": 60,
+        "hittableLevelMin": 3
+      },
+      {
+        "id": "gold_vein_deep",
+        "sprite": "Sprites/Tiles/Gold_Vein_Deep",
+        "healthMin": 55,
+        "healthMax": 80,
+        "hittableLevelMin": 4
+      },
+      {
+        "id": "obsidian",
+        "sprite": "Sprites/Tiles/Obsidian",
+        "healthMin": 70,
+        "healthMax": 100,
+        "hittableLevelMin": 5
+      }
+    ],
+    "Upgrade": []
+  }
+}
