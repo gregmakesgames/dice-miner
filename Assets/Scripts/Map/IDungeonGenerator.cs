@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using GameData;
 
 public interface IDungeonGenerator
 {
     void Initialize(
-        IReadOnlyList<ConfigEntity> tileConfigs,
-        IReadOnlyList<ConfigEntity> fieldEntityConfigs,
+        IReadOnlyList<TileTypeData> tileConfigs,
+        IReadOnlyList<FieldEntityData> fieldEntityConfigs,
         int width,
         int height,
         Random random);
 
-    ConfigEntity PickTile(int x, int y);
-    ConfigEntity PickFieldEntity(int x, int y);
+    TileTypeData PickTile(int x, int y);
+    FieldEntityData PickFieldEntity(int x, int y);
 }

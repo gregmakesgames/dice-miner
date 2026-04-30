@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
+using GameData;
 using UnityEngine;
 
 public sealed class MapGenerator : MonoBehaviour
 {
-    public const string PLAYER_SPAWN_ID = "player_spawn";
-
     [Header("Map Size")]
     [SerializeField] private int width = 30;
     [SerializeField] private int height = 30;
@@ -38,7 +37,6 @@ public sealed class MapGenerator : MonoBehaviour
     [SerializeField] private int fieldEntityPoolMaxSize = 1024;
 
     private IDungeonGenerator dungeon;
-    private bool dungeonExplicitlySet;
     private System.Random random;
     private Transform generatedTilesRoot;
     private Transform generatedFieldEntitiesRoot;
@@ -47,24 +45,13 @@ public sealed class MapGenerator : MonoBehaviour
     private Tile pooledTilePrefab;
     private FieldEntity pooledFieldEntityPrefab;
 
-    private void Start()
-    {
-        if (generateOnStart)
-        {
-            Generate();
-        }
-    }
+    public IReadOnlyList<Tile> Tiles => tilePool?.ActiveTiles;
+    public IReadOnlyList<FieldEntity> FieldEntities => fieldEntityPool?.ActiveEntities;
 
     private void OnDestroy()
     {
         DisposeTilePool();
         DisposeFieldEntityPool();
-    }
-
-    public void SetDungeonGenerator(IDungeonGenerator customGenerator)
-    {
-        dungeon = customGenerator;
-        dungeonExplicitlySet = customGenerator != null;
     }
 
     [ContextMenu("Regenerate")]
@@ -82,7 +69,7 @@ public sealed class MapGenerator : MonoBehaviour
             return;
         }
 
-        IReadOnlyList<ConfigEntity> tileConfigs = GameDataRegistry.GetAll("TileType");
+        IReadOnlyList<TileTypeData> tileConfigs = GameDataRegistry.GetAll<TileTypeData>();
         if (tileConfigs.Count == 0)
         {
             Debug.LogWarning("MapGenerator: no TileType configs found. Add TileType entries to game data.");
@@ -91,34 +78,19 @@ public sealed class MapGenerator : MonoBehaviour
             return;
         }
 
-        IReadOnlyList<ConfigEntity> fieldEntityConfigs = GameDataRegistry.GetAll("FieldEntity");
+        IReadOnlyList<FieldEntityData> fieldEntityConfigs = GameDataRegistry.GetAll<FieldEntityData>();
 
         random = useRandomSeed ? new System.Random() : new System.Random(seed);
-
-        if (!dungeonExplicitlySet)
-        {
-            // Rebuild the default each call so inspector tweaks to room params apply live.
-            dungeon = BuildDefaultDungeonGenerator();
-        }
+        
+        dungeon = new RoomsDungeonGenerator(roomCountMin, roomCountMax, roomSizeMin, roomSizeMax);
 
         dungeon.Initialize(tileConfigs, fieldEntityConfigs, validatedWidth, validatedHeight, random);
 
         EnsureTilePool();
         tilePool.ReleaseAll();
 
-        bool hasFieldEntityPrefab = fieldEntityPrefab != null;
-        if (hasFieldEntityPrefab)
-        {
-            EnsureFieldEntityPool();
-            fieldEntityPool.ReleaseAll();
-        }
-        else
-        {
-            ReleaseActiveFieldEntities();
-        }
-
-        Vector3 playerSpawnLocalPos = Vector3.zero;
-        bool hasPlayerSpawn = false;
+        EnsureFieldEntityPool();
+        fieldEntityPool.ReleaseAll();
 
         for (int y = 0; y < validatedHeight; y++)
         {
@@ -126,76 +98,31 @@ public sealed class MapGenerator : MonoBehaviour
             {
                 Vector3 localPos = GridToLocalPosition(x, y, validatedWidth, validatedHeight, validatedTileSize);
 
-                ConfigEntity tileConfig = dungeon.PickTile(x, y);
-                if (tileConfig != null)
+                var tileData = dungeon.PickTile(x, y);
+                if (tileData != null)
                 {
                     Tile tile = tilePool.Get();
-                    tile.name = $"Tile_{x}_{y}_{tileConfig.Id}";
+                    tile.name = $"Tile_{x}_{y}_{tileData.Id}";
                     tile.transform.localPosition = localPos;
-                    tile.Init(tileConfig, RollHealth(tileConfig), ReleaseTile);
+                    tile.Init(tileData, RollHealth(tileData), ReleaseTile);
                 }
 
-                ConfigEntity fieldEntityConfig = dungeon.PickFieldEntity(x, y);
-                if (fieldEntityConfig == null)
+                var fieldEntityData = dungeon.PickFieldEntity(x, y);
+                if (fieldEntityData != null)
                 {
-                    continue;
-                }
-
-                if (fieldEntityConfig.Id == PLAYER_SPAWN_ID)
-                {
-                    playerSpawnLocalPos = localPos;
-                    hasPlayerSpawn = true;
-                    continue;
-                }
-
-                if (hasFieldEntityPrefab)
-                {
-                    FieldEntity entity = fieldEntityPool.Get();
-                    entity.name = $"FieldEntity_{x}_{y}_{fieldEntityConfig.Id}";
+                    var entity = fieldEntityPool.Get();
+                    entity.name = $"FieldEntity_{x}_{y}_{fieldEntityData.Id}";
                     entity.transform.localPosition = localPos;
-                    entity.Init(fieldEntityConfig, ReleaseFieldEntity);
-                }
-                else
-                {
-                    Debug.LogWarning(
-                        $"MapGenerator: FieldEntity '{fieldEntityConfig.Id}' was scheduled at ({x},{y}) but fieldEntityPrefab is not assigned.");
+                    entity.Init(fieldEntityData, ReleaseFieldEntity);
                 }
             }
         }
-
-        if (hasPlayerSpawn)
-        {
-            PositionPlayerAt(playerSpawnLocalPos);
-        }
     }
 
-    private void PositionPlayerAt(Vector3 localPos)
+    private int RollHealth(TileTypeData config)
     {
-        if (player == null)
-        {
-            return;
-        }
-
-        Transform parent = ResolveTilesParent();
-        Vector3 worldPos = parent.TransformPoint(localPos);
-        worldPos.z = player.position.z;
-        player.position = worldPos;
-
-        if (cameraFollow != null)
-        {
-            cameraFollow.SnapTo(player);
-        }
-    }
-
-    private IDungeonGenerator BuildDefaultDungeonGenerator()
-    {
-        return new RoomsDungeonGenerator(roomCountMin, roomCountMax, roomSizeMin, roomSizeMax);
-    }
-
-    private int RollHealth(ConfigEntity config)
-    {
-        int min = Mathf.Max(0, config.GetInt("healthMin"));
-        int max = Mathf.Max(min, config.GetInt("healthMax"));
+        int min = Mathf.Max(0, config.HealthMin);
+        int max = Mathf.Max(min, config.HealthMax);
         if (min == max)
         {
             return min;
@@ -226,15 +153,13 @@ public sealed class MapGenerator : MonoBehaviour
 
     private void EnsureTilePool()
     {
-        Transform parent = ResolveTilesParent();
-
         if (generatedTilesRoot == null)
         {
-            Transform existing = parent.Find("GeneratedTiles");
+            Transform existing = tilesParent.Find("GeneratedTiles");
             generatedTilesRoot = existing != null
                 ? existing
                 : new GameObject("GeneratedTiles").transform;
-            generatedTilesRoot.SetParent(parent, false);
+            generatedTilesRoot.SetParent(tilesParent, false);
         }
 
         if (tilePool != null && pooledTilePrefab == tilePrefab)
@@ -249,15 +174,13 @@ public sealed class MapGenerator : MonoBehaviour
 
     private void EnsureFieldEntityPool()
     {
-        Transform parent = ResolveTilesParent();
-
         if (generatedFieldEntitiesRoot == null)
         {
-            Transform existing = parent.Find("GeneratedFieldEntities");
+            Transform existing = tilesParent.Find("GeneratedFieldEntities");
             generatedFieldEntitiesRoot = existing != null
                 ? existing
                 : new GameObject("GeneratedFieldEntities").transform;
-            generatedFieldEntitiesRoot.SetParent(parent, false);
+            generatedFieldEntitiesRoot.SetParent(tilesParent, false);
         }
 
         if (fieldEntityPool != null && pooledFieldEntityPrefab == fieldEntityPrefab)
@@ -312,11 +235,6 @@ public sealed class MapGenerator : MonoBehaviour
         fieldEntityPool.Dispose();
         fieldEntityPool = null;
         pooledFieldEntityPrefab = null;
-    }
-
-    private Transform ResolveTilesParent()
-    {
-        return tilesParent != null ? tilesParent : transform;
     }
 
     private Vector3 GridToLocalPosition(int x, int y, int mapWidth, int mapHeight, float step)

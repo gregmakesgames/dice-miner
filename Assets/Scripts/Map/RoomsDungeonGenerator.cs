@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameData;
+using Map;
 using UnityEngine;
 
 public sealed class RoomsDungeonGenerator : IDungeonGenerator
@@ -9,10 +11,6 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     private const string FillerFamily = "filler";
     private const string OutlineFamily = "outline";
     private const string AnyFamily = "any";
-    private const string PlacementUnderneath = "underneath";
-    private const string PlacementReplace = "replace";
-    private const string RolePlayerSpawn = "playerSpawn";
-    private const string RoleExit = "exit";
     private const int PlayerSpawnClearRadius = 1; // 3x3 area: center +/- 1
     private const int RoomPlacementRetries = 32;
 
@@ -29,16 +27,16 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     private readonly int roomSizeMax;
 
     private Category[,] grid;
-    private ConfigEntity[,] fieldEntities;
+    private FieldEntityData[,] fieldEntities;
     private bool[,] tileRemoved;
     private List<RectInt> rooms;
     private int gridWidth;
     private int gridHeight;
     private bool ready;
 
-    private ConfigEntity wallTile;
-    private ConfigEntity fillerTile;
-    private ConfigEntity outlineTile;
+    private TileTypeData wallTile;
+    private TileTypeData fillerTile;
+    private TileTypeData outlineTile;
 
     public RoomsDungeonGenerator(int roomCountMin, int roomCountMax, int roomSizeMin, int roomSizeMax)
     {
@@ -49,8 +47,8 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     }
 
     public void Initialize(
-        IReadOnlyList<ConfigEntity> tileConfigs,
-        IReadOnlyList<ConfigEntity> fieldEntityConfigs,
+        IReadOnlyList<TileTypeData> tileConfigs,
+        IReadOnlyList<FieldEntityData> fieldEntityConfigs,
         int width,
         int height,
         System.Random random)
@@ -73,19 +71,19 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
 
         System.Random rng = random ?? new System.Random();
 
-        List<ConfigEntity> walls = new();
-        List<ConfigEntity> fillers = new();
-        List<ConfigEntity> outlines = new();
+        List<TileTypeData> walls = new();
+        List<TileTypeData> fillers = new();
+        List<TileTypeData> outlines = new();
 
         for (int i = 0; i < tileConfigs.Count; i++)
         {
-            ConfigEntity entry = tileConfigs[i];
+            TileTypeData entry = tileConfigs[i];
             if (entry == null)
             {
                 continue;
             }
 
-            string family = entry.GetString("family");
+            string family = entry.Family;
             if (string.Equals(family, WallFamily, StringComparison.Ordinal))
             {
                 walls.Add(entry);
@@ -118,7 +116,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         ready = true;
     }
 
-    public ConfigEntity PickTile(int x, int y)
+    public TileTypeData PickTile(int x, int y)
     {
         if (!ready || grid == null || x < 0 || y < 0 || x >= gridWidth || y >= gridHeight)
         {
@@ -138,7 +136,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         };
     }
 
-    public ConfigEntity PickFieldEntity(int x, int y)
+    public FieldEntityData PickFieldEntity(int x, int y)
     {
         if (!ready || fieldEntities == null || x < 0 || y < 0 || x >= gridWidth || y >= gridHeight)
         {
@@ -151,7 +149,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
     private void BuildLayout(System.Random rng)
     {
         grid = new Category[gridHeight, gridWidth];
-        fieldEntities = new ConfigEntity[gridWidth, gridHeight];
+        fieldEntities = new FieldEntityData[gridWidth, gridHeight];
         tileRemoved = new bool[gridHeight, gridWidth];
         bool[,] carved = new bool[gridHeight, gridWidth];
 
@@ -173,15 +171,15 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         StampWalls(carved);
     }
 
-    private void PlaceFieldEntities(System.Random rng, IReadOnlyList<ConfigEntity> fieldEntityConfigs)
+    private void PlaceFieldEntities(System.Random rng, IReadOnlyList<FieldEntityData> fieldEntityConfigs)
     {
         if (fieldEntityConfigs == null || fieldEntityConfigs.Count == 0 || fieldEntities == null)
         {
             return;
         }
 
-        ConfigEntity playerSpawnConfig = fieldEntityConfigs.First(x => x.Id == "player_spawn");
-        ConfigEntity exitConfig = fieldEntityConfigs.First(x => x.Id == "exit");
+        FieldEntityData playerSpawnConfig = fieldEntityConfigs.First(x => x.Id == MapEntitiesIds.PLAYER_SPAWN);
+        FieldEntityData exitConfig = fieldEntityConfigs.First(x => x.Id == MapEntitiesIds.EXIT);
 
         int spawnRoomIndex = -1;
         spawnRoomIndex = PlacePlayerSpawn(rng, playerSpawnConfig);
@@ -192,29 +190,22 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
 
         for (int i = 0; i < fieldEntityConfigs.Count; i++)
         {
-            ConfigEntity entity = fieldEntityConfigs[i];
+            FieldEntityData entity = fieldEntityConfigs[i];
             if (entity == null)
             {
                 continue;
             }
 
-            string role = entity.GetString("role");
-            if (!string.IsNullOrEmpty(role))
-            {
-                continue;
-            }
-
-            int spawnMin = Mathf.Max(0, entity.GetInt("spawnCountMin"));
-            int spawnMax = Mathf.Max(spawnMin, entity.GetInt("spawnCountMax"));
+            int spawnMin = Mathf.Max(0, entity.SpawnCountMin);
+            int spawnMax = Mathf.Max(spawnMin, entity.SpawnCountMax);
             int count = spawnMin == spawnMax ? spawnMin : rng.Next(spawnMin, spawnMax + 1);
             if (count <= 0)
             {
                 continue;
             }
 
-            string allowedFamily = entity.GetString("allowedTileFamily");
-            string placement = entity.GetString("placement");
-            bool replace = string.Equals(placement, PlacementReplace, StringComparison.Ordinal);
+            string allowedFamily = entity.AllowedTileFamily;
+            bool replace = entity.IsReplace;
 
             CollectCandidates(allowedFamily, candidates);
             if (candidates.Count == 0)
@@ -238,7 +229,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         }
     }
 
-    private int PlacePlayerSpawn(System.Random rng, ConfigEntity config)
+    private int PlacePlayerSpawn(System.Random rng, FieldEntityData config)
     {
         if (rooms == null || rooms.Count == 0)
         {
@@ -271,7 +262,7 @@ public sealed class RoomsDungeonGenerator : IDungeonGenerator
         return roomIndex;
     }
 
-    private void PlaceExit(ConfigEntity config, int spawnRoomIndex)
+    private void PlaceExit(FieldEntityData config, int spawnRoomIndex)
     {
         if (rooms == null || rooms.Count == 0)
         {

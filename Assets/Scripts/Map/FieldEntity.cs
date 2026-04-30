@@ -1,26 +1,22 @@
 using System;
+using GameData;
 using UnityEngine;
-using UnityEngine.UI;
 
 [DisallowMultipleComponent]
 public class FieldEntity : MonoBehaviour
 {
-    private const string PlacementUnderneath = "underneath";
-
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Transform innerContainer;
 
     private Action<FieldEntity> releaseCallback;
 
-    public ConfigEntity Config { get; private set; }
-    public string Placement { get; private set; }
-    public bool IsUnderneath => string.Equals(Placement, PlacementUnderneath, StringComparison.Ordinal);
+    public FieldEntityData Config { get; private set; }
+    public bool IsUnderneath => Config != null && Config.IsUnderneath;
 
-    public void Init(ConfigEntity entityConfig, Action<FieldEntity> onReleaseRequested)
+    public void Init(FieldEntityData entityConfig, Action<FieldEntity> onReleaseRequested)
     {
         Config = entityConfig;
         releaseCallback = onReleaseRequested;
-        Placement = entityConfig != null ? entityConfig.GetString("placement") : string.Empty;
 
         if (spriteRenderer == null)
         {
@@ -29,7 +25,7 @@ public class FieldEntity : MonoBehaviour
 
         if (spriteRenderer != null)
         {
-            spriteRenderer.sprite = entityConfig != null ? entityConfig.GetSprite("sprite") : null;
+            spriteRenderer.sprite = entityConfig != null ? entityConfig.Sprite : null;
             // 'underneath' entities sit behind the tile so they only show once the tile is gone.
             spriteRenderer.sortingOrder = IsUnderneath ? -1 : 0;
         }
@@ -43,7 +39,6 @@ public class FieldEntity : MonoBehaviour
     {
         Config = null;
         releaseCallback = null;
-        Placement = string.Empty;
 
         if (spriteRenderer != null)
         {

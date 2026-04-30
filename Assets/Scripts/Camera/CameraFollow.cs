@@ -45,4 +45,9 @@ public sealed class CameraFollow : MonoBehaviour
         float z = ignoreZ ? transform.position.z : t.z;
         return new Vector3(t.x + offset.x, t.y + offset.y, z);
     }
+
+    public void JumpToTarget()
+    {
+        transform.position = ComputeDesired();
+    }
 }

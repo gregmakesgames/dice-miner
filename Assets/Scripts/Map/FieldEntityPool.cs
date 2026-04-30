@@ -32,6 +32,7 @@ public sealed class FieldEntityPool : IDisposable
 
     public int ActiveCount => activeEntities.Count;
     public int InactiveCount => pool.CountInactive;
+    public IReadOnlyList<FieldEntity> ActiveEntities => activeEntities;
 
     public FieldEntity Get()
     {

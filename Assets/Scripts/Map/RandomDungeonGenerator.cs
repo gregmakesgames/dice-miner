@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
+using GameData;
 
 public sealed class RandomDungeonGenerator : IDungeonGenerator
 {
-    private IReadOnlyList<ConfigEntity> tileConfigs = Array.Empty<ConfigEntity>();
+    private IReadOnlyList<TileTypeData> tileConfigs = Array.Empty<TileTypeData>();
     private Random random = new();
 
     public void Initialize(
-        IReadOnlyList<ConfigEntity> tileConfigs,
-        IReadOnlyList<ConfigEntity> fieldEntityConfigs,
+        IReadOnlyList<TileTypeData> tileConfigs,
+        IReadOnlyList<FieldEntityData> fieldEntityConfigs,
         int width,
         int height,
         Random random)
     {
-        this.tileConfigs = tileConfigs ?? Array.Empty<ConfigEntity>();
+        this.tileConfigs = tileConfigs ?? Array.Empty<TileTypeData>();
         this.random = random ?? new Random();
     }
 
-    public ConfigEntity PickTile(int x, int y)
+    public TileTypeData PickTile(int x, int y)
     {
         if (tileConfigs.Count == 0)
         {
@@ -28,7 +29,7 @@ public sealed class RandomDungeonGenerator : IDungeonGenerator
         return tileConfigs[index];
     }
 
-    public ConfigEntity PickFieldEntity(int x, int y)
+    public FieldEntityData PickFieldEntity(int x, int y)
     {
         return null;
     }

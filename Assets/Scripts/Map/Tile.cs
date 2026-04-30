@@ -1,4 +1,5 @@
 using System;
+using GameData;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class Tile : MonoBehaviour
 
     private Action<Tile> releaseCallback;
 
-    public ConfigEntity Config { get; private set; }
+    public TileTypeData Config { get; private set; }
     public int Health { get; private set; }
     public int MaxHealth { get; private set; }
     public int HittableLevelMin { get; private set; }
@@ -21,13 +22,13 @@ public class Tile : MonoBehaviour
 
     public event Action<Tile> Destroyed;
 
-    public void Init(ConfigEntity tileConfig, int health, Action<Tile> onReleaseRequested)
+    public void Init(TileTypeData tileConfig, int health, Action<Tile> onReleaseRequested)
     {
         Config = tileConfig;
         releaseCallback = onReleaseRequested;
         MaxHealth = Mathf.Max(0, health);
         Health = MaxHealth;
-        HittableLevelMin = tileConfig != null ? Mathf.Max(1, tileConfig.GetInt("hittableLevelMin")) : 1;
+        HittableLevelMin = tileConfig != null ? Mathf.Max(1, tileConfig.HittableLevelMin) : 1;
 
         UpdateHealthUI();
 
@@ -38,7 +39,7 @@ public class Tile : MonoBehaviour
 
         if (spriteRenderer != null)
         {
-            spriteRenderer.sprite = tileConfig != null ? tileConfig.GetSprite("sprite") : null;
+            spriteRenderer.sprite = tileConfig != null ? tileConfig.Sprite : null;
         }
         else
         {

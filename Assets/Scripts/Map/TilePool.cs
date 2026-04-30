@@ -32,6 +32,7 @@ public sealed class TilePool : IDisposable
 
     public int ActiveCount => activeTiles.Count;
     public int InactiveCount => pool.CountInactive;
+    public IReadOnlyList<Tile> ActiveTiles => activeTiles;
 
     public Tile Get()
     {
