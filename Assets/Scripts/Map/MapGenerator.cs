@@ -7,8 +7,13 @@ public sealed class MapGenerator : MonoBehaviour
     [Header("Map Size")]
     [SerializeField] private int width = 30;
     [SerializeField] private int height = 30;
-    [SerializeField] private int emptyCenterSize = 5;
     [SerializeField] private float tileSize = 1f;
+
+    [Header("Rooms")]
+    [SerializeField] private int roomCountMin = 3;
+    [SerializeField] private int roomCountMax = 6;
+    [SerializeField] private int roomSizeMin = 4;
+    [SerializeField] private int roomSizeMax = 8;
 
     [Header("Random")]
     [SerializeField] private bool useRandomSeed = true;
@@ -23,7 +28,8 @@ public sealed class MapGenerator : MonoBehaviour
     [SerializeField] private int poolDefaultCapacity = 256;
     [SerializeField] private int poolMaxSize = 4096;
 
-    private ITileDistribution distribution = new RandomTileDistribution();
+    private ITileDistribution distribution;
+    private bool distributionExplicitlySet;
     private System.Random random;
     private Transform generatedTilesRoot;
     private TilePool tilePool;
@@ -44,7 +50,8 @@ public sealed class MapGenerator : MonoBehaviour
 
     public void SetDistribution(ITileDistribution customDistribution)
     {
-        distribution = customDistribution ?? new RandomTileDistribution();
+        distribution = customDistribution;
+        distributionExplicitlySet = customDistribution != null;
     }
 
     [ContextMenu("Regenerate")]
@@ -52,7 +59,6 @@ public sealed class MapGenerator : MonoBehaviour
     {
         int validatedWidth = Mathf.Max(1, width);
         int validatedHeight = Mathf.Max(1, height);
-        int validatedCenterSize = Mathf.Clamp(emptyCenterSize, 0, Mathf.Min(validatedWidth, validatedHeight));
         float validatedTileSize = Mathf.Max(0.01f, tileSize);
 
         if (tilePrefab == null)
@@ -71,27 +77,22 @@ public sealed class MapGenerator : MonoBehaviour
         }
 
         random = useRandomSeed ? new System.Random() : new System.Random(seed);
-        distribution.Initialize(tileConfigs, random);
+
+        if (!distributionExplicitlySet)
+        {
+            // Rebuild the default each call so inspector tweaks to room params apply live.
+            distribution = BuildDefaultDistribution();
+        }
+
+        distribution.Initialize(tileConfigs, validatedWidth, validatedHeight, random);
 
         EnsurePool();
         tilePool.ReleaseAll();
-
-        int emptyMinX = (validatedWidth - validatedCenterSize) / 2;
-        int emptyMinY = (validatedHeight - validatedCenterSize) / 2;
-        int emptyMaxX = emptyMinX + validatedCenterSize - 1;
-        int emptyMaxY = emptyMinY + validatedCenterSize - 1;
 
         for (int y = 0; y < validatedHeight; y++)
         {
             for (int x = 0; x < validatedWidth; x++)
             {
-                if (validatedCenterSize > 0 &&
-                    x >= emptyMinX && x <= emptyMaxX &&
-                    y >= emptyMinY && y <= emptyMaxY)
-                {
-                    continue;
-                }
-
                 ConfigEntity tileConfig = distribution.PickTile(x, y);
                 if (tileConfig == null)
                 {
@@ -104,6 +105,11 @@ public sealed class MapGenerator : MonoBehaviour
                 tile.Init(tileConfig, RollTileHealth(tileConfig), ReleaseTile);
             }
         }
+    }
+
+    private ITileDistribution BuildDefaultDistribution()
+    {
+        return new RoomsTileDistribution(roomCountMin, roomCountMax, roomSizeMin, roomSizeMax);
     }
 
     private int RollTileHealth(ConfigEntity tileConfig)

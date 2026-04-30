@@ -148,10 +148,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8403cbc628b014bdc84626aa153c7969, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
-  width: 30
-  height: 30
-  emptyCenterSize: 5
+  width: 60
+  height: 60
   tileSize: 1
+  roomCountMin: 8
+  roomCountMax: 24
+  roomSizeMin: 4
+  roomSizeMax: 8
   useRandomSeed: 1
   seed: 12345
   generateOnStart: 1

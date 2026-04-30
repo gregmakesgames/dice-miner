@@ -6,56 +6,64 @@
         "sprite": "Sprites/Tiles/Earth",
         "healthMin": 10,
         "healthMax": 20,
-        "hittableLevelMin": 1
+        "hittableLevelMin": 1,
+        "family": "filler"
       },
       {
         "id": "stone",
         "sprite": "Sprites/Tiles/Stone",
         "healthMin": 20,
         "healthMax": 35,
-        "hittableLevelMin": 1
+        "hittableLevelMin": 1,
+        "family": "filler"
       },
       {
         "id": "limestone",
         "sprite": "Sprites/Tiles/Limestone",
         "healthMin": 25,
         "healthMax": 40,
-        "hittableLevelMin": 2
+        "hittableLevelMin": 2,
+        "family": "filler"
       },
       {
         "id": "mossy_wall",
         "sprite": "Sprites/Tiles/Mossy_Wall",
         "healthMin": 30,
         "healthMax": 45,
-        "hittableLevelMin": 2
+        "hittableLevelMin": 2,
+        "family": "wall"
       },
       {
         "id": "stone_wall",
         "sprite": "Sprites/Tiles/Stone_Wall",
         "healthMin": 35,
         "healthMax": 55,
-        "hittableLevelMin": 3
+        "hittableLevelMin": 3,
+        "family": "wall"
       },
       {
         "id": "gold_vein",
         "sprite": "Sprites/Tiles/Gold_Vein",
         "healthMin": 40,
         "healthMax": 60,
-        "hittableLevelMin": 3
+        "hittableLevelMin": 3,
+        "family": ""
       },
       {
         "id": "gold_vein_deep",
         "sprite": "Sprites/Tiles/Gold_Vein_Deep",
         "healthMin": 55,
         "healthMax": 80,
-        "hittableLevelMin": 4
+        "hittableLevelMin": 4,
+        "family": ""
       },
       {
         "id": "obsidian",
         "sprite": "Sprites/Tiles/Obsidian",
         "healthMin": 70,
         "healthMax": 100,
-        "hittableLevelMin": 5
+        "hittableLevelMin": 5,
+        "family": "outline"
       }
     ],
     "Upgrade": []

@@ -22,6 +22,11 @@
           "name": "hittableLevelMin",
           "type": 0,
           "refType": ""
+        },
+        {
+          "name": "family",
+          "type": 3,
+          "refType": ""
         }
       ]
     },

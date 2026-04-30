@@ -6,7 +6,7 @@ public sealed class RandomTileDistribution : ITileDistribution
     private IReadOnlyList<ConfigEntity> tileConfigs = Array.Empty<ConfigEntity>();
     private Random random = new();
 
-    public void Initialize(IReadOnlyList<ConfigEntity> tileConfigs, Random random)
+    public void Initialize(IReadOnlyList<ConfigEntity> tileConfigs, int width, int height, Random random)
     {
         this.tileConfigs = tileConfigs ?? Array.Empty<ConfigEntity>();
         this.random = random ?? new Random();
