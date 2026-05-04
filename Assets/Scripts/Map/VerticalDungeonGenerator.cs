@@ -80,12 +80,11 @@ public sealed class VerticalDungeonGenerator : IDungeonGenerator
                 continue;
             }
 
-            var family = entry.Family;
-            if (string.Equals(family, FillerFamily, StringComparison.Ordinal))
+            if (entry.Family == FillerFamily)
             {
                 fillers.Add(entry);
             }
-            else if (string.Equals(family, OutlineFamily, StringComparison.Ordinal))
+            else if (entry.Family == OutlineFamily)
             {
                 outlines.Add(entry);
             }
@@ -144,7 +143,7 @@ public sealed class VerticalDungeonGenerator : IDungeonGenerator
         {
             for (var x = 0; x < gridWidth; x++)
             {
-                var isPerimeter = x == 0 || y == 0 || x == gridWidth - 1 || y == gridHeight - 1;
+                var isPerimeter = x == 0 || y == 0 || x == gridWidth - 1;
                 tiles[y, x] = isPerimeter
                     ? outlineTile
                     : fillers[rng.Next(0, fillers.Count)];

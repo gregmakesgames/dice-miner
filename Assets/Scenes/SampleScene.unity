@@ -156,7 +156,6 @@ MonoBehaviour:
   roomCountMax: 24
   roomSizeMin: 4
   roomSizeMax: 8
-  verticalDifficulty: 1
   useRandomSeed: 1
   seed: 12345
   generateOnStart: 1
@@ -215,6 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Map.GameplayController
   mapGenerator: {fileID: 39387969}
   cameraFollow: {fileID: 330585548}
+  levelCameraAnchor: {fileID: 1044101865}
   playerControllerPrefab: {fileID: 11400001, guid: 91ba2e0cad134f7791db2d37d69191b1, type: 3}
 --- !u!4 &195848066
 Transform:
@@ -230,6 +230,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 39387970}
+  - {fileID: 1044101866}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
@@ -382,7 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662f5514c7b74e2d8f5fb79009c7d351, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  target: {fileID: 0}
+  target: {fileID: 1044101866}
   smoothTime: 0.15
   offset: {x: 0, y: 0}
   ignoreZ: 1
@@ -561,6 +562,52 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1044101864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1044101866}
+  - component: {fileID: 1044101865}
+  m_Layer: 0
+  m_Name: LevelCameraAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1044101865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044101864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 603f02102e53546f2bc007178fc97425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelCameraAnchor
+  offset: {x: 0, y: 0}
+  onlyHittableTiles: 1
+--- !u!4 &1044101866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044101864}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 195848066}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
