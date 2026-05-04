@@ -18,13 +18,9 @@ namespace Map
         private void StartGameplay()
         {
             mapGenerator.Generate();
-
-            var playerSpawn = mapGenerator.FieldEntities.First(x => x.Config.Id == MapEntitiesIds.PLAYER_SPAWN);
             
-            var player = Instantiate(playerControllerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
-
-            cameraFollow.Target = player.transform;
-            cameraFollow.JumpToTarget();
+            // cameraFollow.Target = player.transform;
+            // cameraFollow.JumpToTarget();
 
         }
     }

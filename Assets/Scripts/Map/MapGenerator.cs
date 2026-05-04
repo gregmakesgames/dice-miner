@@ -5,6 +5,15 @@ using UnityEngine;
 
 public sealed class MapGenerator : MonoBehaviour
 {
+    public enum DungeonMode
+    {
+        Rooms,
+        Vertical,
+    }
+
+    [Header("Generator")]
+    [SerializeField] private DungeonMode mode = DungeonMode.Rooms;
+
     [Header("Map Size")]
     [SerializeField] private int width = 30;
     [SerializeField] private int height = 30;
@@ -55,10 +64,23 @@ public sealed class MapGenerator : MonoBehaviour
     }
 
     [ContextMenu("Regenerate")]
-    public void Generate()
+    public void Generate(int difficulty = 1)
     {
-        int validatedWidth = Mathf.Max(1, width);
-        int validatedHeight = Mathf.Max(1, height);
+        int validatedWidth;
+        int validatedHeight;
+
+        if (mode == DungeonMode.Vertical)
+        {
+            // Vertical generator owns its dimensions based on difficulty.
+            validatedWidth = VerticalDungeonGenerator.GetWidthForDifficulty(difficulty);
+            validatedHeight = VerticalDungeonGenerator.GetHeightForDifficulty(difficulty);
+        }
+        else
+        {
+            validatedWidth = Mathf.Max(1, width);
+            validatedHeight = Mathf.Max(1, height);
+        }
+
         float validatedTileSize = Mathf.Max(0.01f, tileSize);
 
         if (tilePrefab == null)
@@ -81,8 +103,10 @@ public sealed class MapGenerator : MonoBehaviour
         IReadOnlyList<FieldEntityData> fieldEntityConfigs = GameDataRegistry.GetAll<FieldEntityData>();
 
         random = useRandomSeed ? new System.Random() : new System.Random(seed);
-        
-        dungeon = new RoomsDungeonGenerator(roomCountMin, roomCountMax, roomSizeMin, roomSizeMax);
+
+        dungeon = mode == DungeonMode.Vertical
+            ? new VerticalDungeonGenerator(difficulty)
+            : new RoomsDungeonGenerator(roomCountMin, roomCountMax, roomSizeMin, roomSizeMax);
 
         dungeon.Initialize(tileConfigs, fieldEntityConfigs, validatedWidth, validatedHeight, random);
 
