@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using UnityEngine;
 
 namespace Map
@@ -10,6 +8,7 @@ namespace Map
         [SerializeField] private CameraFollow cameraFollow;
         [SerializeField] private LevelCameraAnchor levelCameraAnchor;
         [SerializeField] private PlayerController playerControllerPrefab;
+        [SerializeField] private DiceDropController diceDropController;
 
         private void Awake()
         {

@@ -193,6 +193,7 @@ GameObject:
   m_Component:
   - component: {fileID: 195848066}
   - component: {fileID: 195848065}
+  - component: {fileID: 195848067}
   m_Layer: 0
   m_Name: LevelController
   m_TagString: Untagged
@@ -216,6 +217,7 @@ MonoBehaviour:
   cameraFollow: {fileID: 330585548}
   levelCameraAnchor: {fileID: 1044101865}
   playerControllerPrefab: {fileID: 11400001, guid: 91ba2e0cad134f7791db2d37d69191b1, type: 3}
+  diceDropController: {fileID: 195848067}
 --- !u!4 &195848066
 Transform:
   m_ObjectHideFlags: 0
@@ -233,6 +235,24 @@ Transform:
   - {fileID: 1044101866}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &195848067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195848064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f42978aa117294b0cb67820f0c9780c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiceDropController
+  mapGenerator: {fileID: 39387969}
+  dicePrefab: {fileID: 3297931123061003836, guid: a8e5cd6e8828b450c935d00c6213e263, type: 3}
+  ghostPrefab: {fileID: 8809102531931306279, guid: 025085886519d4663a2874e64f459821, type: 3}
+  aimCamera: {fileID: 330585545}
+  dropDuration: 0.45
+  spawnTopMargin: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

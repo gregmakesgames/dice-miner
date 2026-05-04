@@ -143,7 +143,7 @@ public sealed class VerticalDungeonGenerator : IDungeonGenerator
         {
             for (var x = 0; x < gridWidth; x++)
             {
-                var isPerimeter = x == 0 || y == 0 || x == gridWidth - 1;
+                var isPerimeter = x == 0 || y == gridHeight - 1 || x == gridWidth - 1;
                 tiles[y, x] = isPerimeter
                     ? outlineTile
                     : fillers[rng.Next(0, fillers.Count)];

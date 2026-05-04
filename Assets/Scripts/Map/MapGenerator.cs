@@ -53,9 +53,17 @@ public sealed class MapGenerator : MonoBehaviour
     private FieldEntityPool fieldEntityPool;
     private Tile pooledTilePrefab;
     private FieldEntity pooledFieldEntityPrefab;
+    private Tile[,] tilesByCell;
+    private int generatedWidth;
+    private int generatedHeight;
+    private float generatedTileSize = 1f;
 
     public IReadOnlyList<Tile> Tiles => tilePool?.ActiveTiles;
     public IReadOnlyList<FieldEntity> FieldEntities => fieldEntityPool?.ActiveEntities;
+    public int GridWidth => generatedWidth;
+    public int GridHeight => generatedHeight;
+    public float TileSize => generatedTileSize;
+    public Transform TilesParent => tilesParent;
 
     private void OnDestroy()
     {
@@ -82,6 +90,10 @@ public sealed class MapGenerator : MonoBehaviour
         }
 
         float validatedTileSize = Mathf.Max(0.01f, tileSize);
+        generatedWidth = validatedWidth;
+        generatedHeight = validatedHeight;
+        generatedTileSize = validatedTileSize;
+        tilesByCell = new Tile[generatedWidth, generatedHeight];
 
         if (tilePrefab == null)
         {
@@ -129,6 +141,7 @@ public sealed class MapGenerator : MonoBehaviour
                     tile.name = $"Tile_{x}_{y}_{tileData.Id}";
                     tile.transform.localPosition = localPos;
                     tile.Init(tileData, RollHealth(tileData), ReleaseTile);
+                    tilesByCell[x, y] = tile;
                 }
 
                 var fieldEntityData = dungeon.PickFieldEntity(x, y);
@@ -153,6 +166,51 @@ public sealed class MapGenerator : MonoBehaviour
         }
 
         return random.Next(min, max + 1);
+    }
+
+    public bool TryWorldXToColumn(float worldX, out int column)
+    {
+        column = -1;
+        if (generatedWidth <= 2 || generatedTileSize <= 0f || tilesParent == null)
+        {
+            return false;
+        }
+
+        var localX = tilesParent.InverseTransformPoint(new Vector3(worldX, 0f, 0f)).x;
+        var normalized = localX / generatedTileSize + generatedWidth / 2f - 0.5f;
+        var rawColumn = Mathf.RoundToInt(normalized);
+        column = rawColumn;
+        return true;
+    }
+
+    public Vector3 GridToWorldPosition(int x, int y)
+    {
+        if (generatedWidth <= 0 || generatedHeight <= 0)
+        {
+            return Vector3.zero;
+        }
+
+        var local = GridToLocalPosition(x, y, generatedWidth, generatedHeight, generatedTileSize);
+        return tilesParent != null ? tilesParent.TransformPoint(local) : local;
+    }
+
+    public int GetTopFreeRow(int column)
+    {
+        if (generatedHeight <= 0 || tilesByCell == null || column < 0 || column >= generatedWidth)
+        {
+            return -1;
+        }
+
+        for (var y = 0; y < generatedHeight; y++)
+        {
+            var tile = tilesByCell[column, y];
+            if (tile == null || tile.IsDestroyed)
+            {
+                return y;
+            }
+        }
+
+        return 0;
     }
 
     private void ReleaseTile(Tile tile)
@@ -264,7 +322,7 @@ public sealed class MapGenerator : MonoBehaviour
     private Vector3 GridToLocalPosition(int x, int y, int mapWidth, int mapHeight, float step)
     {
         float centeredX = (x - mapWidth / 2f + 0.5f) * step;
-        float centeredY = (y - mapHeight / 2f + 0.5f) * step;
+        float centeredY = (-y - mapHeight / 2f + 0.5f) * step;
         return new Vector3(centeredX, centeredY, 0f);
     }
 }
