@@ -1,27 +1,28 @@
+using Gameplay.Map;
 using UnityEngine;
 
-namespace Map
+namespace Gameplay
 {
     public class GameplayController : MonoBehaviour
     {
-        [SerializeField] private MapGenerator mapGenerator;
+        [SerializeField] private FieldController fieldController;
         [SerializeField] private CameraFollow cameraFollow;
         [SerializeField] private LevelCameraAnchor levelCameraAnchor;
         [SerializeField] private PlayerController playerControllerPrefab;
         [SerializeField] private DiceDropController diceDropController;
 
-        private void Awake()
+        private void Start()
         {
             StartGameplay();
         }
 
         private void StartGameplay()
         {
-            mapGenerator.Generate();
+            fieldController.PrepareMap();
 
             if (levelCameraAnchor != null)
             {
-                levelCameraAnchor.SetTiles(mapGenerator.Tiles);
+                levelCameraAnchor.Init();
 
                 if (cameraFollow != null)
                 {

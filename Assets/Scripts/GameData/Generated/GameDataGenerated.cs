@@ -33,31 +33,6 @@ namespace GameData
         [JsonProperty("family")] public string Family { get; private set; } = string.Empty;
     }
 
-    public sealed class FieldEntityData : DataEntity
-    {
-        [JsonProperty("sprite")] private string _spritePath = string.Empty;
-        [JsonIgnore] private Sprite _sprite;
-        [JsonIgnore] private bool _spriteLoaded;
-        [JsonIgnore] public Sprite Sprite
-        {
-            get
-            {
-                if (!_spriteLoaded)
-                {
-                    _sprite = string.IsNullOrEmpty(_spritePath) ? null : Resources.Load<Sprite>(_spritePath);
-                    _spriteLoaded = true;
-                }
-                return _sprite;
-            }
-        }
-        [JsonProperty("allowedTileFamily")] public string AllowedTileFamily { get; private set; } = string.Empty;
-        [JsonProperty("spawnCountMin")] public int SpawnCountMin { get; private set; }
-        [JsonProperty("spawnCountMax")] public int SpawnCountMax { get; private set; }
-        [JsonProperty("isReplace")] public bool IsReplace { get; private set; }
-        [JsonProperty("isUnderneath")] public bool IsUnderneath { get; private set; }
-        [JsonProperty("size"), JsonConverter(typeof(Vector2JsonConverter))] public Vector2 Size { get; private set; }
-    }
-
     public sealed class UpgradeData : DataEntity
     {
         [JsonProperty("image")] private string _imagePath = string.Empty;
@@ -100,7 +75,6 @@ namespace GameData
         public static readonly IReadOnlyDictionary<string, Type> Map = new Dictionary<string, Type>(StringComparer.Ordinal)
         {
             { "TileType", typeof(TileTypeData) },
-            { "FieldEntity", typeof(FieldEntityData) },
             { "Upgrade", typeof(UpgradeData) },
         };
     }

@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using Gameplay;
+using Gameplay.Map;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -10,69 +13,38 @@ public sealed class LevelCameraAnchor : MonoBehaviour
     [Tooltip("If true, only tiles a player can break (IsHittable) influence the anchor.")]
     [SerializeField] private bool onlyHittableTiles = true;
 
-    private readonly List<Tile> trackedTiles = new();
-    private bool dirty;
+    private bool _dirty;
 
-    public void SetTiles(IReadOnlyList<Tile> tiles)
+    private IDisposable _destroysubscribtion;
+    
+    public void Init()
     {
-        UnsubscribeAll();
-        trackedTiles.Clear();
+        Unsubscribe();
 
-        if (tiles != null)
-        {
-            for (var i = 0; i < tiles.Count; i++)
-            {
-                var tile = tiles[i];
-                if (tile == null)
-                {
-                    continue;
-                }
+        _destroysubscribtion = VisualMessageBroker.Subscribe(VisualMessageType.TileDestroyed, async (x, y, z) => OnTileDestroyed(x as Tile));
 
-                if (onlyHittableTiles && !tile.IsHittable)
-                {
-                    continue;
-                }
-
-                trackedTiles.Add(tile);
-                tile.Destroyed += OnTileDestroyed;
-            }
-        }
-
-        dirty = false;
+        _dirty = false;
         Recompute();
-    }
-
-    public void Clear()
-    {
-        UnsubscribeAll();
-        trackedTiles.Clear();
     }
 
     private void OnDestroy()
     {
-        UnsubscribeAll();
+        Unsubscribe();
     }
 
     private void OnTileDestroyed(Tile tile)
     {
-        if (tile != null)
-        {
-            tile.Destroyed -= OnTileDestroyed;
-        }
-
-        // The list is compacted lazily during Recompute so we don't pay the
-        // cost on every individual destruction within a frame.
-        dirty = true;
+        _dirty = true;
     }
 
     private void LateUpdate()
     {
-        if (!dirty)
+        if (!_dirty)
         {
             return;
         }
 
-        dirty = false;
+        _dirty = false;
         Recompute();
     }
 
@@ -83,12 +55,11 @@ public sealed class LevelCameraAnchor : MonoBehaviour
         var topY = float.NegativeInfinity;
         var hasAny = false;
 
-        for (var i = trackedTiles.Count - 1; i >= 0; i--)
+        for (var i = FieldController.Instance.FieldEntities.Count - 1; i >= 0; i--)
         {
-            var tile = trackedTiles[i];
+            var tile = FieldController.Instance.FieldEntities[i] as Tile;
             if (tile == null || tile.IsDestroyed)
             {
-                trackedTiles.RemoveAt(i);
                 continue;
             }
 
@@ -121,15 +92,9 @@ public sealed class LevelCameraAnchor : MonoBehaviour
         transform.position = new Vector3(centerX + offset.x, topY + offset.y, pos.z);
     }
 
-    private void UnsubscribeAll()
+    private void Unsubscribe()
     {
-        for (var i = 0; i < trackedTiles.Count; i++)
-        {
-            var tile = trackedTiles[i];
-            if (tile != null)
-            {
-                tile.Destroyed -= OnTileDestroyed;
-            }
-        }
+        _destroysubscribtion?.Dispose();
+        _destroysubscribtion = null;
     }
 }

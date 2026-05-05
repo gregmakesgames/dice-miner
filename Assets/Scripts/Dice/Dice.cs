@@ -1,26 +1,17 @@
 using DG.Tweening;
+using Gameplay;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public sealed class Dice : MonoBehaviour
+public sealed class Dice : FieldEntity
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    private Color defaultColor = Color.white;
-
-    private void Awake()
+    public void Init(Vector2Int position)
     {
-        if (spriteRenderer == null)
-        {
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        }
-
-        if (spriteRenderer != null)
-        {
-            defaultColor = spriteRenderer.color;
-        }
+        Position = position;
     }
-
+    
     public void DropTo(Vector3 worldTarget, float duration)
     {
         transform.DOKill();

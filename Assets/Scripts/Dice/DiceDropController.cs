@@ -1,9 +1,10 @@
+using DiceMiner.Gameplay;
+using Gameplay;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public sealed class DiceDropController : MonoBehaviour
 {
-    [SerializeField] private MapGenerator mapGenerator;
     [SerializeField] private Dice dicePrefab;
     [SerializeField] private GameObject ghostPrefab;
     [SerializeField] private Camera aimCamera;
@@ -19,12 +20,6 @@ public sealed class DiceDropController : MonoBehaviour
 
     private void Update()
     {
-        if (mapGenerator == null)
-        {
-            SetGhostVisible(false);
-            return;
-        }
-
         if (dicePrefab == null)
         {
             SetGhostVisible(false);
@@ -44,20 +39,10 @@ public sealed class DiceDropController : MonoBehaviour
             return;
         }
 
-        if (!mapGenerator.TryWorldXToColumn(pointerWorld.x, out var column))
-        {
-            SetGhostVisible(false);
-            return;
-        }
+        var column = MapHelper.GetColumnByWorldX(pointerWorld.x);
+        var landingRow = FieldController.Instance.GetTopRow(column);
 
-        var landingRow = mapGenerator.GetTopFreeRow(column);
-        if (landingRow < 0)
-        {
-            SetGhostVisible(false);
-            return;
-        }
-
-        var landing = mapGenerator.GridToWorldPosition(column, landingRow - 1);
+        var landing = MapHelper.GridToWorldPosition(column, landingRow - 1);
         var spawnY = GetSpawnWorldY(cam, landing);
         EnsureGhosts();
         ghost.transform.position = landing;
@@ -65,24 +50,27 @@ public sealed class DiceDropController : MonoBehaviour
 
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            DropDice(dicePrefab, landing, spawnY);
+            DropDice(dicePrefab, new Vector2Int(column, landingRow - 1), spawnY);
         }
     }
 
-    private void DropDice(Dice prefab, Vector3 landing, float spawnY)
+    private void DropDice(Dice prefab, Vector2Int position, float spawnY)
     {
-        var spawn = new Vector3(landing.x, spawnY, landing.z);
-        var parent = mapGenerator.TilesParent;
-        var dropped = Instantiate(prefab, spawn, Quaternion.identity, parent);
-        dropped.gameObject.name = "DroppedDice";
-        dropped.DropTo(landing, dropDuration);
+        var landingPosition = MapHelper.GridToWorldPosition(position.x, position.y);
+        var spawn = new Vector3(landingPosition.x, spawnY, landingPosition.z);
+        var parent = FieldController.Instance.EntitiesParent;
+        var dice = Instantiate(prefab, spawn, Quaternion.identity, parent);
+        dice.gameObject.name = "Dice";
+        dice.Init(position);
+        dice.DropTo(landingPosition, dropDuration);
+        FieldController.Instance.AddEntity(dice);
     }
 
     private void EnsureGhosts()
     {
         if (ghost == null)
         {
-            ghost = Instantiate(ghostPrefab, mapGenerator.TilesParent);
+            ghost = Instantiate(ghostPrefab, FieldController.Instance.EntitiesParent);
         }
     }
 
@@ -118,7 +106,7 @@ public sealed class DiceDropController : MonoBehaviour
             return false;
         }
 
-        var targetZ = mapGenerator.TilesParent != null ? mapGenerator.TilesParent.position.z : 0f;
+        var targetZ = FieldController.Instance.EntitiesParent != null ? FieldController.Instance.EntitiesParent.position.z : 0f;
         var depth = Mathf.Abs(cam.transform.position.z - targetZ);
         world = cam.ScreenToWorldPoint(new Vector3(screen.x, screen.y, depth));
         return true;
