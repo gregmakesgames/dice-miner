@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GameData;
 
-namespace Gameplay.Map
+namespace DiceMiner.Gameplay.Map
 {
     public interface IMapGeneratorAlhorythm
     {

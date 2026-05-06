@@ -31,46 +31,6 @@
       ]
     },
     {
-      "name": "FieldEntity",
-      "fields": [
-        {
-          "name": "sprite",
-          "type": 8,
-          "refType": ""
-        },
-        {
-          "name": "allowedTileFamily",
-          "type": 3,
-          "refType": ""
-        },
-        {
-          "name": "spawnCountMin",
-          "type": 0,
-          "refType": ""
-        },
-        {
-          "name": "spawnCountMax",
-          "type": 0,
-          "refType": ""
-        },
-        {
-          "name": "isReplace",
-          "type": 2,
-          "refType": ""
-        },
-        {
-          "name": "isUnderneath",
-          "type": 2,
-          "refType": ""
-        },
-        {
-          "name": "size",
-          "type": 4,
-          "refType": ""
-        }
-      ]
-    },
-    {
       "name": "Upgrade",
       "fields": [
         {
@@ -97,6 +57,16 @@
           "name": "lockedBy",
           "type": 7,
           "refType": "Upgrade"
+        }
+      ]
+    },
+    {
+      "name": "DiceType",
+      "fields": [
+        {
+          "name": "prefab",
+          "type": 10,
+          "refType": ""
         }
       ]
     }

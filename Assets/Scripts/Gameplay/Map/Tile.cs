@@ -1,8 +1,9 @@
+using Cysharp.Threading.Tasks;
 using GameData;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Gameplay.Map
+namespace DiceMiner.Gameplay.Map
 {
     public class Tile : FieldEntity
     {
@@ -43,7 +44,7 @@ namespace Gameplay.Map
             }
         }
 
-        public void TakeDamage(int amount)
+        public async UniTask TakeDamage(int amount)
         {
             if (amount <= 0 || MaxHealth <= 0 || Health <= 0 || !IsHittable)
             {
@@ -78,7 +79,7 @@ namespace Gameplay.Map
         {
             VisualMessageBroker.TryVisualize(this, VisualMessageType.TileDestroyed);
 
-            TilePool.Release(this);
+            Dispose();
         }
 
         private void UpdateHealthUI()
@@ -99,6 +100,11 @@ namespace Gameplay.Map
         private void Reset()
         {
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        public override void Dispose()
+        {
+            TilePool.Release(this);
         }
     }
 }

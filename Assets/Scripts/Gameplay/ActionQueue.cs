@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Gameplay
+namespace DiceMiner.Gameplay
 {
     public class ActionQueue : MonoBehaviour
     {

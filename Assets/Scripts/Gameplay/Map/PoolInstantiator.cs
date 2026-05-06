@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace Gameplay.Map
+namespace DiceMiner.Gameplay.Map
 {
     public class PoolInstantiator : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Gameplay
+namespace DiceMiner.Gameplay
 {
     public abstract class Action : MonoBehaviour
     {

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using DiceMiner.Gameplay;
 using GameData;
 using UnityEngine;
 
-namespace Gameplay.Map
+namespace DiceMiner.Gameplay.Map
 {
     public sealed class MapGenerator : MonoBehaviour
     {

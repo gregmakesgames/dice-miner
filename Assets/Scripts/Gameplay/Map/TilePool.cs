@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace Gameplay.Map
+namespace DiceMiner.Gameplay.Map
 {
     public sealed class TilePool : IDisposable
     {

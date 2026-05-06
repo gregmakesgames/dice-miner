@@ -66,34 +66,12 @@
         "family": "outline"
       }
     ],
-    "FieldEntity": [
+    "Upgrade": [],
+    "DiceType": [
       {
-        "id": "player_spawn",
-        "sprite": "",
-        "allowedTileFamily": "",
-        "spawnCountMin": 0,
-        "spawnCountMax": 0,
-        "isReplace": false,
-        "isUnderneath": false,
-        "size": {
-          "x": 1.0,
-          "y": 1.0
-        }
-      },
-      {
-        "id": "exit",
-        "sprite": "",
-        "allowedTileFamily": "",
-        "spawnCountMin": 0,
-        "spawnCountMax": 0,
-        "isReplace": false,
-        "isUnderneath": false,
-        "size": {
-          "x": 2.0,
-          "y": 2.0
-        }
+        "id": "plainDice",
+        "prefab": "Prefabs/Dices/PlainDice"
       }
-    ],
-    "Upgrade": []
+    ]
   }
 }

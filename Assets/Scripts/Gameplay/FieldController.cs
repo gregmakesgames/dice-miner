@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using DiceMiner.Gameplay;
-using Gameplay.Map;
+using DiceMiner.Gameplay.Map;
 using UnityEngine;
 
-namespace Gameplay
+namespace DiceMiner.Gameplay
 {
     public class FieldController : MonoBehaviour
     {

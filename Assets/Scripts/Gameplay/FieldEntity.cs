@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
-namespace Gameplay
+namespace DiceMiner.Gameplay
 {
-    public class FieldEntity : MonoBehaviour
+    public abstract class FieldEntity : MonoBehaviour, IDisposable
     {
         public Vector2Int Position { get; protected set; }
+
+        public abstract void Dispose();
     }
 }

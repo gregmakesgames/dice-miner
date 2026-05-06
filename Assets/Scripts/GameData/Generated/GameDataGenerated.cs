@@ -70,12 +70,32 @@ namespace GameData
         }
     }
 
+    public sealed class DiceTypeData : DataEntity
+    {
+        [JsonProperty("prefab")] private string _prefabPath = string.Empty;
+        [JsonIgnore] private GameObject _prefab;
+        [JsonIgnore] private bool _prefabLoaded;
+        [JsonIgnore] public GameObject Prefab
+        {
+            get
+            {
+                if (!_prefabLoaded)
+                {
+                    _prefab = string.IsNullOrEmpty(_prefabPath) ? null : Resources.Load<GameObject>(_prefabPath);
+                    _prefabLoaded = true;
+                }
+                return _prefab;
+            }
+        }
+    }
+
     public static class GameDataTypes
     {
         public static readonly IReadOnlyDictionary<string, Type> Map = new Dictionary<string, Type>(StringComparer.Ordinal)
         {
             { "TileType", typeof(TileTypeData) },
             { "Upgrade", typeof(UpgradeData) },
+            { "DiceType", typeof(DiceTypeData) },
         };
     }
 }

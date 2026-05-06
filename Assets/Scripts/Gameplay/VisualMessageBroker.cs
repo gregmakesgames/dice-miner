@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
-namespace Gameplay
+namespace DiceMiner.Gameplay
 {
     public enum VisualMessageType
     {
