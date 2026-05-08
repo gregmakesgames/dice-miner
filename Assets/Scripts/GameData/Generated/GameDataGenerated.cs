@@ -89,6 +89,10 @@ namespace GameData
         }
     }
 
+    public sealed class LevelData : DataEntity
+    {
+    }
+
     public static class GameDataTypes
     {
         public static readonly IReadOnlyDictionary<string, Type> Map = new Dictionary<string, Type>(StringComparer.Ordinal)
@@ -96,6 +100,7 @@ namespace GameData
             { "TileType", typeof(TileTypeData) },
             { "Upgrade", typeof(UpgradeData) },
             { "DiceType", typeof(DiceTypeData) },
+            { "Level", typeof(LevelData) },
         };
     }
 }

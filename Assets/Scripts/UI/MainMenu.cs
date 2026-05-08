@@ -26,9 +26,7 @@ namespace DiceMiner.UI
             await SceneManager.LoadSceneAsync("GameplayScene");
             var gameplayController = FindFirstObjectByType<GameplayController>();
             await gameplayController.PrepareSave(savedGame);
-            await gameplayController.PrepareNextLevel();
             await CrossFadeController.EndCrossFade();
-            await gameplayController.StartNextLevel();
         }
     }
 }

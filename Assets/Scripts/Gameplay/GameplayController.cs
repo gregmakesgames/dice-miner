@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using DiceMiner.Camera;
 using DiceMiner.Gameplay.UI;
 using DiceMiner.UI;
+using GameData;
 using UnityEngine;
 
 namespace DiceMiner.Gameplay
@@ -9,11 +10,14 @@ namespace DiceMiner.Gameplay
     public class GameplayController : MonoBehaviour
     {
         [SerializeField] private GameplayUIRoot  gameplayUIRoot;
-        [SerializeField] private FieldController fieldController;
+        [SerializeField] private FieldController fieldControllerPrefab;
         [SerializeField] private CameraFollow cameraFollow;
         [SerializeField] private LevelCameraAnchor levelCameraAnchor;
         [SerializeField] private DiceDropController diceDropController;
 
+        private SavedGame _savedGame;
+        private FieldController _fieldController;
+        
         private void Start()
         {
             diceDropController.EnableInteraction(false);
@@ -21,15 +25,26 @@ namespace DiceMiner.Gameplay
 
         public async UniTask PrepareSave(SavedGame savedGame)
         {
+            _savedGame = savedGame;
+            GoToSelectLevelMenu();
+        }
+
+        private void GoToSelectLevelMenu()
+        {
+            gameplayUIRoot.MainMenu.Show();
+        }
+
+        private void GoToLevel(LevelData level)
+        {
             
         }
 
-        public async UniTask PrepareNextLevel()
+        private async UniTask PrepareNextLevel()
         {
             
         }
         
-        public async UniTask StartNextLevel()
+        private async UniTask StartNextLevel()
         {
             await CrossFadeController.StartCrossFade();
             ClearOldGameplay();
@@ -40,12 +55,14 @@ namespace DiceMiner.Gameplay
 
         private void ClearOldGameplay()
         {
-            
+            Destroy(_fieldController.gameObject);
+            _fieldController = null;
         }
 
         private void StartGameplay()
         {
-            fieldController.PrepareMap();
+            _fieldController = Instantiate(fieldControllerPrefab);
+            _fieldController.PrepareMap();
 
             if (levelCameraAnchor != null)
             {
