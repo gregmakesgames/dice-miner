@@ -46,7 +46,7 @@ namespace DiceMiner.Gameplay.Map
                         Tile tile = TilePool.Get();
                         tile.name = $"Tile_{x}_{y}_{tileData.Id}";
                         tile.transform.SetParent(tileParent, false);
-                        ApplyTileLayout(tile, MapHelper.GridToLocalPosition(x, y));
+                        ApplyTileLayout(tile, x, y);
                         tile.Init(tileData, new Vector2Int(x, y), RollHealth(tileData));
                         resultingTiles.Add(tile);
                     }
@@ -57,7 +57,7 @@ namespace DiceMiner.Gameplay.Map
         }
 
 
-        private void ApplyTileLayout(Tile tile, Vector2 anchoredPosition)
+        private void ApplyTileLayout(Tile tile, int x, int y)
         {
             var rect = tile.transform as RectTransform;
             if (rect == null)
@@ -67,16 +67,13 @@ namespace DiceMiner.Gameplay.Map
 
             if (rect == null)
             {
+                var local = MapHelper.GridToLocalPosition(x, y);
                 Debug.LogWarning($"Tile '{tile.name}' is missing a RectTransform. Falling back to local position.", tile);
-                tile.transform.localPosition = new Vector3(anchoredPosition.x, anchoredPosition.y, 0f);
+                tile.transform.localPosition = new Vector3(local.x, local.y, 0f);
                 return;
             }
 
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(MapHelper.TILE_SIZE, MapHelper.TILE_SIZE);
-            rect.anchoredPosition = anchoredPosition;
+            MapHelper.ApplyGridCellLayout(rect, x, y);
         }
 
         private int RollHealth(TileTypeData config)

@@ -10,6 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5344461487841881379}
   - component: {fileID: 892192768829801052}
+  - component: {fileID: 8781740658976085055}
+  - component: {fileID: 3150625849383154929}
+  - component: {fileID: 6324449490884823547}
   m_Layer: 5
   m_Name: DiceHolder
   m_TagString: Untagged
@@ -52,3 +55,43 @@ MonoBehaviour:
   floatAmplitude: 0
   floatSpeed: 2.2
   floatPhaseSpread: 0.37
+  spawnFallFromAbove: 720
+  spawnFallDuration: 0.5
+  spawnFallStagger: 0.15
+  spawnFallEase: 6
+--- !u!114 &8781740658976085055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966279418044070115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 894386a9ad0bf4bd8af8a15c69ec3fdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrishaWorkshops.Tools.EmptyGraphic
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &3150625849383154929
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966279418044070115}
+  m_CullTransparentMesh: 1
+--- !u!225 &6324449490884823547
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966279418044070115}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

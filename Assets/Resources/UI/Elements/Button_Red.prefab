@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
   m_EffectColor: {r: 0.50980395, g: 0.11764706, b: 0.16470589, a: 1}
-  m_EffectDistance: {x: 0, y: -4}
+  m_EffectDistance: {x: 0, y: -6}
   m_UseGraphicAlpha: 1
 --- !u!1 &6415235020926290862
 GameObject:

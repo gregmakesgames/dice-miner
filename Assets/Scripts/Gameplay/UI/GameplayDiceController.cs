@@ -66,9 +66,46 @@ namespace DiceMiner.Gameplay.UI
             {
                 var (dice, anchor) = pending[i];
                 var holder = Instantiate(diceHolderPrefab, diceHoldersContainer);
-                holder.Init(dice, anchor, i);
+                holder.Init(dice, anchor, this, i);
                 _diceInstances.Add((anchor, holder));
             }
+        }
+
+        public bool TryCommitDropFromHolder(DiceHolder holder, Vector2Int cell)
+        {
+            if (holder == null)
+                return false;
+
+            var field = FieldController.Instance;
+            if (field == null)
+                return false;
+
+            if (field.HasEntityAt(cell))
+                return false;
+
+            var dice = holder.GetComponentInChildren<Dice>(true);
+            if (dice == null)
+                return false;
+
+            var diceRect = dice.transform as RectTransform;
+
+            var index = _diceInstances.FindIndex(x => x.holder == holder);
+
+            var (anchor, h) = _diceInstances[index];
+            _diceInstances.RemoveAt(index);
+
+            if (anchor != null)
+                Destroy(anchor.gameObject);
+
+            var value = dice.Value;
+
+            diceRect.SetParent(field.EntitiesParent, false);
+            MapHelper.ApplyGridCellLayout(diceRect, cell.x, cell.y);
+            dice.Init(cell, value);
+            field.AddEntity(dice);
+
+            Destroy(h.gameObject);
+            return true;
         }
     }
 }

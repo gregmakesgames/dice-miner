@@ -1,11 +1,13 @@
-using DiceMiner.Gameplay;
+using System.Collections.Generic;
 using DiceMiner.Gameplay.Data;
+using DiceMiner.Gameplay.Map;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace DiceMiner.Gameplay.UI
 {
-    public class DiceHolder : MonoBehaviour
+    public class DiceHolder : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [Header("Follow")]
         [SerializeField] private float followSmoothTime = 0.18f;
@@ -25,6 +27,7 @@ namespace DiceMiner.Gameplay.UI
         private RectTransform _anchor;
         private RectTransform _rectTransform;
         private RectTransform _parentRect;
+        private GameplayDiceController _owner;
 
         private Vector2 _followLocal;
         private Vector2 _followVelocity;
@@ -34,12 +37,23 @@ namespace DiceMiner.Gameplay.UI
         private float _spawnFallYOffset;
         private bool _spawnFallActive;
 
-        public void Init(DiceGameplayData dice, RectTransform anchor, int spawnIndex = 0)
+        private CanvasGroup _canvasGroup;
+        private bool _dragging;
+
+        private void Awake()
+        {
+            _canvasGroup = GetComponent<CanvasGroup>();
+            if (_canvasGroup == null)
+                _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+
+        public void Init(DiceGameplayData dice, RectTransform anchor, GameplayDiceController owner, int spawnIndex = 0)
         {
             KillSpawnFallTween();
 
             _dice = dice;
             _anchor = anchor;
+            _owner = owner;
             _rectTransform = (RectTransform)transform;
             _parentRect = _rectTransform.parent as RectTransform;
             _floatPhase = Random.Range(0f, Mathf.PI * 2f);
@@ -119,9 +133,73 @@ namespace DiceMiner.Gameplay.UI
             }
         }
 
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            Debug.Log("OnBeginDrag");
+            if (_owner == null || _parentRect == null)
+                return;
+
+            KillSpawnFallTween();
+            _dragging = true;
+            _canvasGroup.blocksRaycasts = false;
+            _followVelocity = Vector2.zero;
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            Debug.Log("OnDrag");
+            if (!_dragging || _parentRect == null)
+                return;
+
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    _parentRect, eventData.position, eventData.pressEventCamera, out var localPoint))
+            {
+                _followLocal = localPoint;
+                ApplyAnchoredPosition();
+            }
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            Debug.Log("OnEndDrag");
+            if (!_dragging)
+                return;
+
+            _dragging = false;
+            if (_canvasGroup != null)
+                _canvasGroup.blocksRaycasts = true;
+
+            if (_owner == null || !TryResolveDropCell(out var cell))
+                return;
+
+            if (_owner.TryCommitDropFromHolder(this, cell))
+                return;
+
+            _followVelocity = Vector2.zero;
+        }
+        
+        private bool TryResolveDropCell(out Vector2Int cell)
+        {
+            cell = default;
+            if (_parentRect == null)
+                return false;
+
+            var worldPoint = _parentRect.TransformPoint(new Vector3(_followLocal.x, _followLocal.y, 0f));
+            return MapHelper.TryWorldPointToGridCell(worldPoint, out cell);
+        }
+        
         private void LateUpdate()
         {
-            if (_anchor == null || _parentRect == null)
+            if (_parentRect == null)
+                return;
+
+            if (_dragging)
+            {
+                ApplyAnchoredPosition();
+                return;
+            }
+
+            if (_anchor == null)
                 return;
 
             var anchorLocal = GetAnchorLocalInParent();
@@ -133,7 +211,7 @@ namespace DiceMiner.Gameplay.UI
 
         private void ApplyAnchoredPosition()
         {
-            var floatOffset = _spawnFallActive
+            var floatOffset = _spawnFallActive || _dragging
                 ? Vector2.zero
                 : new Vector2(
                     Mathf.Sin(_floatPhase) * floatAmplitude,

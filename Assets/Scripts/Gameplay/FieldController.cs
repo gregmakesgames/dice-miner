@@ -46,7 +46,12 @@ namespace DiceMiner.Gameplay
         {
             _fieldEntities.Remove(fieldEntity);
         }
-        
+
+        public bool HasEntityAt(Vector2Int cell)
+        {
+            return _fieldEntities.Any(e => e is Tile && e.Position == cell);
+        }
+
         public int GetTopRow(int column)
         {
             if (FieldEntities.Any(x => x.Position.x == column))

@@ -24,6 +24,7 @@ namespace DiceMiner.UI
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SetAlpha(0f);
+            fadeImage.raycastTarget = true;
         }
 
         public static async UniTask StartCrossFade()
@@ -33,6 +34,8 @@ namespace DiceMiner.UI
                 return;
             }
 
+            Instance.fadeImage.raycastTarget = true;
+            
             await Instance.FadeTo(1f);
         }
         
@@ -44,6 +47,8 @@ namespace DiceMiner.UI
             }
             
             await Instance.FadeTo(0f);
+            
+            Instance.fadeImage.raycastTarget = false;
         }
 
         private static bool EnsureInstance()

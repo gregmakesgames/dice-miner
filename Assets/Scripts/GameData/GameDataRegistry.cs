@@ -7,22 +7,21 @@ using UnityEngine;
 
 namespace GameData
 {
-    public static class GameDataRegistry
+    public class GameDataRegistry
     {
         private const string DataResourcePath = "GameData/data";
 
-        private static readonly Dictionary<Type, Dictionary<string, DataEntity>> entitiesByType = new();
-        private static readonly Dictionary<Type, IList> orderedEntitiesByType = new();
+        private readonly Dictionary<Type, Dictionary<string, DataEntity>> entitiesByType = new();
+        private readonly Dictionary<Type, IList> orderedEntitiesByType = new();
 
-        private static bool isLoaded;
+        private bool isLoaded;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void EnsureLoadedAtStartup()
+        public GameDataRegistry()
         {
             Load();
         }
 
-        public static void Load(bool forceReload = false)
+        public void Load(bool forceReload = false)
         {
             if (isLoaded && !forceReload)
             {
@@ -36,12 +35,12 @@ namespace GameData
             isLoaded = true;
         }
 
-        public static T Get<T>(string id) where T : DataEntity
+        public T Get<T>(string id) where T : DataEntity
         {
             return GetById(typeof(T), id) as T;
         }
 
-        public static IReadOnlyList<T> GetAll<T>() where T : DataEntity
+        public IReadOnlyList<T> GetAll<T>() where T : DataEntity
         {
             Load();
             if (orderedEntitiesByType.TryGetValue(typeof(T), out IList list) &&
@@ -53,7 +52,7 @@ namespace GameData
             return Array.Empty<T>();
         }
 
-        public static DataEntity GetById(Type type, string id)
+        public DataEntity GetById(Type type, string id)
         {
             Load();
             if (type == null || string.IsNullOrWhiteSpace(id))
@@ -67,7 +66,7 @@ namespace GameData
                 : null;
         }
 
-        private static void LoadData()
+        private void LoadData()
         {
             TextAsset dataAsset = Resources.Load<TextAsset>(DataResourcePath);
             if (dataAsset == null)
