@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DiceMiner.Gameplay.Data;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DiceMiner.Gameplay.UI
 {
@@ -43,6 +44,7 @@ namespace DiceMiner.Gameplay.UI
                 return;
             }
 
+            var pending = new List<(DiceGameplayData dice, RectTransform anchor)>();
             foreach (var dice in dices)
             {
                 var anchorGo = Instantiate(diceAnchorPrefab, diceAnchorContainer);
@@ -54,8 +56,17 @@ namespace DiceMiner.Gameplay.UI
                     continue;
                 }
 
+                pending.Add((dice, anchor));
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(diceAnchorContainer);
+            Canvas.ForceUpdateCanvases();
+
+            for (var i = 0; i < pending.Count; i++)
+            {
+                var (dice, anchor) = pending[i];
                 var holder = Instantiate(diceHolderPrefab, diceHoldersContainer);
-                holder.Init(dice, anchor);
+                holder.Init(dice, anchor, i);
                 _diceInstances.Add((anchor, holder));
             }
         }

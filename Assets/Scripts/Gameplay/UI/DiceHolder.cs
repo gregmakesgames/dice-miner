@@ -1,5 +1,6 @@
 using DiceMiner.Gameplay;
 using DiceMiner.Gameplay.Data;
+using DG.Tweening;
 using UnityEngine;
 
 namespace DiceMiner.Gameplay.UI
@@ -14,6 +15,12 @@ namespace DiceMiner.Gameplay.UI
         [SerializeField] private float floatSpeed = 1.1f;
         [SerializeField] private float floatPhaseSpread = 0.37f;
 
+        [Header("Spawn fall")]
+        [SerializeField] private float spawnFallFromAbove = 720f;
+        [SerializeField] private float spawnFallDuration = 0.5f;
+        [SerializeField] private float spawnFallStagger = 0.15f;
+        [SerializeField] private Ease spawnFallEase = Ease.OutQuad;
+
         private DiceGameplayData _dice;
         private RectTransform _anchor;
         private RectTransform _rectTransform;
@@ -23,8 +30,14 @@ namespace DiceMiner.Gameplay.UI
         private Vector2 _followVelocity;
         private float _floatPhase;
 
-        public void Init(DiceGameplayData dice, RectTransform anchor)
+        private Tweener _spawnFallTween;
+        private float _spawnFallYOffset;
+        private bool _spawnFallActive;
+
+        public void Init(DiceGameplayData dice, RectTransform anchor, int spawnIndex = 0)
         {
+            KillSpawnFallTween();
+
             _dice = dice;
             _anchor = anchor;
             _rectTransform = (RectTransform)transform;
@@ -66,8 +79,33 @@ namespace DiceMiner.Gameplay.UI
             else
                 _followLocal = _rectTransform.anchoredPosition;
 
-            _rectTransform.anchoredPosition = _followLocal;
             _followVelocity = Vector2.zero;
+
+            _spawnFallYOffset = spawnFallFromAbove;
+            _spawnFallActive = true;
+            _spawnFallTween = DOTween.To(() => _spawnFallYOffset, y => _spawnFallYOffset = y, 0f, spawnFallDuration)
+                .SetEase(spawnFallEase)
+                .SetDelay(spawnIndex * spawnFallStagger)
+                .OnComplete(() =>
+                {
+                    _spawnFallActive = false;
+                    _spawnFallTween = null;
+                });
+
+            ApplyAnchoredPosition();
+        }
+
+        private void OnDestroy()
+        {
+            KillSpawnFallTween();
+        }
+
+        private void KillSpawnFallTween()
+        {
+            _spawnFallTween?.Kill();
+            _spawnFallTween = null;
+            _spawnFallActive = false;
+            _spawnFallYOffset = 0f;
         }
 
         private void ClearSpawnedDice()
@@ -90,11 +128,18 @@ namespace DiceMiner.Gameplay.UI
             _followLocal = Vector2.SmoothDamp(_followLocal, anchorLocal, ref _followVelocity, followSmoothTime);
 
             _floatPhase += Time.deltaTime * floatSpeed;
-            var floatOffset = new Vector2(
-                Mathf.Sin(_floatPhase) * floatAmplitude,
-                Mathf.Cos(_floatPhase * (1f + floatPhaseSpread)) * floatAmplitude);
+            ApplyAnchoredPosition();
+        }
 
-            _rectTransform.anchoredPosition = _followLocal + floatOffset;
+        private void ApplyAnchoredPosition()
+        {
+            var floatOffset = _spawnFallActive
+                ? Vector2.zero
+                : new Vector2(
+                    Mathf.Sin(_floatPhase) * floatAmplitude,
+                    Mathf.Cos(_floatPhase * (1f + floatPhaseSpread)) * floatAmplitude);
+
+            _rectTransform.anchoredPosition = _followLocal + floatOffset + new Vector2(0f, _spawnFallYOffset);
         }
 
         private Vector2 GetAnchorLocalInParent()
