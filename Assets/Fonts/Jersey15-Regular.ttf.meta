@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 0c9496ad5f7ea4642a71aae22d346210
+guid: f03b11f986f6f40fd8c859a5512b5b48
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
-  fontSize: 64
+  fontSize: 32
   forceTextureCase: -2
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - VT323
+  - Jersey 15
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 2

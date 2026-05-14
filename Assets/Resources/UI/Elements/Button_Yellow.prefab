@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8021950035823204441}
   - component: {fileID: 1124516142572386390}
   - component: {fileID: 3751826551611097813}
-  - component: {fileID: 3805386672035731267}
+  - component: {fileID: 5587892213098114103}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1124516142572386390
@@ -67,8 +67,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 0c9496ad5f7ea4642a71aae22d346210, type: 3}
-    m_FontSize: 96
+    m_Font: {fileID: 12800000, guid: f03b11f986f6f40fd8c859a5512b5b48, type: 3}
+    m_FontSize: 86
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 2
@@ -80,7 +80,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Start
---- !u!114 &3805386672035731267
+--- !u!114 &5587892213098114103
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -89,11 +89,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5858524255303370378}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.68235296, g: 0.49803922, b: 0.21568628, a: 1}
-  m_EffectDistance: {x: 4, y: -4}
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.6431373, g: 0.49411765, b: 0.21960784, a: 1}
+  m_EffectDistance: {x: 0, y: -4}
   m_UseGraphicAlpha: 1
 --- !u!1 &6415235020926290862
 GameObject:
