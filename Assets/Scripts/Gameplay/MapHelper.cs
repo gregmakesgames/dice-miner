@@ -5,7 +5,7 @@ namespace DiceMiner.Gameplay
 {
     public static class MapHelper
     {
-        public const float TILE_SIZE = 1.0f;
+        public const float TILE_SIZE = 100.0f;
         
         public static int GetColumnByWorldX(float worldX)
         {
@@ -26,6 +26,13 @@ namespace DiceMiner.Gameplay
             float centeredX = (x + 0.5f) * TILE_SIZE;
             float centeredY = (-y + 0.5f) * TILE_SIZE;
             return new Vector3(centeredX, centeredY, 0f);
+        }
+
+        public static Vector2 GridToAnchorPosition(int x, int y)
+        {
+            var centeredX = (x + 0.5f) * TILE_SIZE;
+            var centeredY = -(y + 0.5f) * TILE_SIZE;
+            return new Vector2(centeredX, centeredY);
         }
     }
 }

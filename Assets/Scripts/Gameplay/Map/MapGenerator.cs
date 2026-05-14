@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DiceMiner.Gameplay;
 using GameData;
 using UnityEngine;
 
@@ -16,8 +17,14 @@ namespace DiceMiner.Gameplay.Map
         private int generatedWidth;
         private int generatedHeight;
 
-        public List<Tile> Generate(Transform tileParent, int difficulty = 1)
+        public List<Tile> Generate(RectTransform tileParent, int difficulty = 1)
         {
+            if (tileParent == null)
+            {
+                Debug.LogError("MapGenerator.Generate requires a RectTransform parent.", this);
+                return new List<Tile>();
+            }
+
             var generatedWidth = VerticalMapGeneratorAlhorythm.GetWidthForDifficulty(difficulty);
             var generatedHeight = VerticalMapGeneratorAlhorythm.GetHeightForDifficulty(difficulty);
 
@@ -33,15 +40,13 @@ namespace DiceMiner.Gameplay.Map
             {
                 for (int x = 0; x < generatedWidth; x++)
                 {
-                    Vector3 localPos = MapHelper.GridToLocalPosition(x, y);
-
                     var tileData = map.PickTile(x, y);
                     if (tileData != null)
                     {
                         Tile tile = TilePool.Get();
                         tile.name = $"Tile_{x}_{y}_{tileData.Id}";
-                        tile.transform.parent = tileParent;
-                        tile.transform.localPosition = localPos;
+                        tile.transform.SetParent(tileParent, false);
+                        ApplyTileLayout(tile, MapHelper.GridToLocalPosition(x, y));
                         tile.Init(tileData, new Vector2Int(x, y), RollHealth(tileData));
                         resultingTiles.Add(tile);
                     }
@@ -49,6 +54,29 @@ namespace DiceMiner.Gameplay.Map
             }
 
             return resultingTiles;
+        }
+
+
+        private void ApplyTileLayout(Tile tile, Vector2 anchoredPosition)
+        {
+            var rect = tile.transform as RectTransform;
+            if (rect == null)
+            {
+                rect = tile.GetComponent<RectTransform>();
+            }
+
+            if (rect == null)
+            {
+                Debug.LogWarning($"Tile '{tile.name}' is missing a RectTransform. Falling back to local position.", tile);
+                tile.transform.localPosition = new Vector3(anchoredPosition.x, anchoredPosition.y, 0f);
+                return;
+            }
+
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(MapHelper.TILE_SIZE, MapHelper.TILE_SIZE);
+            rect.anchoredPosition = anchoredPosition;
         }
 
         private int RollHealth(TileTypeData config)

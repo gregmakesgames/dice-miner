@@ -22,7 +22,7 @@
         "sprite": "Sprites/Tiles/Limestone",
         "healthMin": 2,
         "healthMax": 8,
-        "hittableLevelMin": 2,
+        "hittableLevelMin": 1,
         "family": "filler"
       },
       {

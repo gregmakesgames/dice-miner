@@ -10,9 +10,9 @@ namespace DiceMiner.Gameplay
         public static FieldController Instance { get; private set; }
         
         [SerializeField] private MapGenerator mapGenerator;
-        [SerializeField] private Transform entitiesParent;
+        [SerializeField] private RectTransform entitiesParent;
         
-        public Transform EntitiesParent => entitiesParent;
+        public RectTransform EntitiesParent => entitiesParent;
         
         private List<FieldEntity> _fieldEntities = new List<FieldEntity>();
         public IReadOnlyList<FieldEntity> FieldEntities => _fieldEntities;

@@ -7,7 +7,7 @@ namespace DiceMiner.Gameplay.Map
 {
     public class Tile : FieldEntity
     {
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Image tileImage;
         [SerializeField] private Transform innerContainer;
         [SerializeField] private Text healthLabel;
         [SerializeField] private GameObject healthContainer;
@@ -29,18 +29,9 @@ namespace DiceMiner.Gameplay.Map
 
             UpdateHealthUI();
 
-            if (spriteRenderer == null)
+            if (tileImage != null)
             {
-                spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            }
-
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.sprite = tileConfig != null ? tileConfig.Sprite : null;
-            }
-            else
-            {
-                Debug.LogWarning($"Tile '{name}' is missing a SpriteRenderer.", this);
+                tileImage.sprite = tileConfig != null ? tileConfig.Sprite : null;
             }
         }
 
@@ -67,9 +58,9 @@ namespace DiceMiner.Gameplay.Map
             MaxHealth = 0;
             HittableLevelMin = 1;
 
-            if (spriteRenderer != null)
+            if (tileImage != null)
             {
-                spriteRenderer.sprite = null;
+                tileImage.sprite = null;
             }
 
             UpdateHealthUI();
@@ -95,11 +86,6 @@ namespace DiceMiner.Gameplay.Map
             {
                 healthLabel.text = showHealth ? Health.ToString() : string.Empty;
             }
-        }
-
-        private void Reset()
-        {
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 
         public override void Dispose()
