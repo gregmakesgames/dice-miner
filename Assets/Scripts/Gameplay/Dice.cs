@@ -7,9 +7,9 @@ namespace DiceMiner.Gameplay
 {
     public sealed class Dice : FieldEntity
     {
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Transform innerContainer;
-        [SerializeField] private Transform manyNumberContainer;
+        [SerializeField] private Image image;
+        [SerializeField] private RectTransform innerContainer;
+        [SerializeField] private GameObject manyNumberContainer;
         [SerializeField] private Text manyNumberLabel;
 
         [Header("Images")]
@@ -48,31 +48,31 @@ namespace DiceMiner.Gameplay
             switch (Value)
             {
                 case 1:
-                    spriteRenderer.sprite = sprite1; 
+                    image.sprite = sprite1; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 case 2:
-                    spriteRenderer.sprite = sprite2; 
+                    image.sprite = sprite2; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 case 3:
-                    spriteRenderer.sprite = sprite3; 
+                    image.sprite = sprite3; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 case 4:
-                    spriteRenderer.sprite = sprite4; 
+                    image.sprite = sprite4; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 case 5:
-                    spriteRenderer.sprite = sprite5; 
+                    image.sprite = sprite5; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 case 6:
-                    spriteRenderer.sprite = sprite6; 
+                    image.sprite = sprite6; 
                     manyNumberContainer.gameObject.SetActive(false);
                     break;
                 default:
-                    spriteRenderer.sprite = spriteMany;
+                    image.sprite = spriteMany;
                     manyNumberLabel.text = $"{Value}";
                     manyNumberContainer.gameObject.SetActive(true);
                     break;
@@ -81,11 +81,6 @@ namespace DiceMiner.Gameplay
             innerContainer.DOPunchScale(new Vector3(2, 2, 2), 0.3f, 0);
         }    
     
-        private void Reset()
-        {
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        }
-
         public override void Dispose()
         {
             Destroy(gameObject);

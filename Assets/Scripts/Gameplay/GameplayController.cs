@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DiceMiner.Gameplay.Data;
 using DiceMiner.Gameplay.UI;
 using DiceMiner.UI;
 using GameData;
@@ -57,6 +59,14 @@ namespace DiceMiner.Gameplay
         {
             _fieldController = Instantiate(fieldControllerPrefab, transform);
             _fieldController.PrepareMap();
+            gameplayUIRoot.LevelWindow.Show();
+            gameplayUIRoot.LevelWindow.DiceController.CreateDices(new List<DiceGameplayData>()
+            {
+                DiceGameplayData.FromSave(new DiceGameplaySaveData() { typeId = "plainDice" }),
+                DiceGameplayData.FromSave(new DiceGameplaySaveData() { typeId = "plainDice" }),
+                DiceGameplayData.FromSave(new DiceGameplaySaveData() { typeId = "plainDice" }),
+                DiceGameplayData.FromSave(new DiceGameplaySaveData() { typeId = "plainDice" }),
+            });
         }
     }
 }

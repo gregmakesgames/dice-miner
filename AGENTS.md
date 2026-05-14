@@ -7,6 +7,7 @@ This file sets guidance for AI agents working on this project.
 - Prefer clean, maintainable code over clever code.
 - Do not touch unrelated files.
 - Do not create, delete or modify .meta files.
+- Do not explain your changes.
 
 ## Safety
 - Never run desctuctive commands unless explisitly requested.
