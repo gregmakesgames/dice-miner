@@ -8,7 +8,7 @@ namespace GrishaGuWorkshop
 {
     public class AudioManager : MonoBehaviour
     {
-        public AudioSource BaseLoopSource
+        public AudioSource BaseMusicSource
         {
             get { return musicSources[0]; }
         }
