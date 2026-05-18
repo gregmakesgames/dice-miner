@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DiceMiner.Gameplay.Data;
 using UnityEngine;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 namespace DiceMiner.Gameplay.UI
 {

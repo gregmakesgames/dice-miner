@@ -12,7 +12,7 @@ namespace DiceMiner.Gameplay.Data
         {
             return new DiceGameplayData()
             {
-                Type = GameDataRegistry.Get<DiceTypeData>(saveData.typeId),
+                Type = GameAssets.configs.Get<DiceTypeData>(saveData.typeId),
             };
         }
 

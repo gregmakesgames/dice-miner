@@ -62,7 +62,7 @@ namespace GameData
             {
                 if (!_lockedByResolved)
                 {
-                    _lockedBy = string.IsNullOrEmpty(_lockedById) ? null : GameAssets..Get<UpgradeData>(_lockedById);
+                    //_lockedBy = string.IsNullOrEmpty(_lockedById) ? null : GameAssets..Get<UpgradeData>(_lockedById);
                     _lockedByResolved = true;
                 }
                 return _lockedBy;

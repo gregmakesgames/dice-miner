@@ -37,7 +37,7 @@ set "LOG_PATH=%PROJECT_PATH%\Build\WebGL\%PROJECT_NAME%_build.log"
 
 echo.
 echo [1/4] Building WebGL via Unity...
-"%UNITY_PATH_6000_3_10%" -batchmode -quit -nographics -projectPath "%PROJECT_PATH%" -executeMethod GrishaWorkshops.Tools.BuildTool.BuildFromCommandLine -buildOutput "%BUILD_DIR%" -logFile "%LOG_PATH%"
+"%UNITY_PATH_6000_3_10%" -batchmode -quit -nographics -projectPath "%PROJECT_PATH%" -executeMethod GrishaGuWorkshop.BuildTool.BuildFromCommandLine -buildOutput "%BUILD_DIR%" -logFile "%LOG_PATH%"
 if errorlevel 1 (
     echo ERROR: Unity build failed. Check log: "%LOG_PATH%"
     exit /b 1

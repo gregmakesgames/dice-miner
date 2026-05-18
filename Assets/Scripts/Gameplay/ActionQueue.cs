@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DiceMiner.Gameplay.Actions;
 using UnityEngine;
 
 namespace DiceMiner.Gameplay
@@ -52,6 +53,11 @@ namespace DiceMiner.Gameplay
             await topmostAction.Act();
             
             _isActing = false;
+        }
+
+        public void PerformActionsOfTag<T>() where T : ActionTag
+        {
+            
         }
     }
 }

@@ -34,7 +34,7 @@ namespace DiceMiner.Gameplay.Map
 
             map = new VerticalMapGeneratorAlhorythm(difficulty);
 
-            map.Initialize(GameDataRegistry.GetAll<TileTypeData>(), generatedWidth, generatedHeight, random);
+            map.Initialize(GameAssets.configs.GetAll<TileTypeData>(), generatedWidth, generatedHeight, random);
 
             for (int y = 0; y < generatedHeight; y++)
             {

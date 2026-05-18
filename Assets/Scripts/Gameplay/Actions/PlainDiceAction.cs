@@ -13,7 +13,7 @@ namespace DiceMiner.Gameplay.Actions
         
         public async override UniTask Act()
         {
-            var buffAmount = Mathf.FloorToInt(G.Instance.UpgradeManager.GetUpgradeValue(UpgradeIds.DICE_BUFF_OTHER_DICE) * thisDice.Value);
+            var buffAmount = Mathf.FloorToInt(thisDice.Value);
             var tasks = new List<UniTask>();
             foreach (var elem in NearEntities())
             {
@@ -37,7 +37,7 @@ namespace DiceMiner.Gameplay.Actions
 
         private IEnumerable<FieldEntity> NearEntities()
         {
-            var upgrade = G.Instance.UpgradeManager.GetUpgradeValue(UpgradeIds.DICE_DISTANCE);
+            var upgrade = 0;
             int distance = Mathf.FloorToInt(1 + upgrade);
 
             return FieldController.Instance.FieldEntities.Where(x => (x.Position - thisDice.Position).magnitude <= distance);

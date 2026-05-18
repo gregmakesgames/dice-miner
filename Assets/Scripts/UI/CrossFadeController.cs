@@ -8,7 +8,7 @@ namespace DiceMiner.UI
     {
         private const string PrefabResourcePath = "UI/CrossFadeController";
 
-        public static CrossFadeController Instance { get; private set; }
+        private static CrossFadeController Instance { get; set; }
         
         [SerializeField] private Image fadeImage;
         [SerializeField] private float fadeDuration = 0.35f;

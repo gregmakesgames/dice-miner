@@ -6,5 +6,10 @@ namespace GameData
     {
         [JsonProperty("id")]
         public string Id { get; private set; } = string.Empty;
+
+        public T GetTag<T>() where T : DataEntityTag, new()
+        {
+            return null;
+        }
     }
 }

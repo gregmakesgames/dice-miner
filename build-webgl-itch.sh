@@ -37,7 +37,7 @@ echo
 echo "[1/4] Building WebGL via Unity..."
 "${UNITY_PATH_6000_3_10}" -batchmode -quit -nographics \
   -projectPath "${PROJECT_PATH}" \
-  -executeMethod GrishaWorkshops.Tools.BuildTool.BuildFromCommandLine \
+  -executeMethod GrishaGuWorkshop.BuildTool.BuildFromCommandLine \
   -buildOutput "${BUILD_DIR}" \
   -logFile "${LOG_PATH}" || {
     echo "ERROR: Unity build failed. Check log: \"${LOG_PATH}\""
