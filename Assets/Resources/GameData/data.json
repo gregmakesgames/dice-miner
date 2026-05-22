@@ -10,21 +10,14 @@
                 {
                   "DiceMiner.Gameplay.Actions.SimpleDamageActionTag": {
                     "damage": 1,
-                    "tags": [
-                      {
-                        "GrishaGuWorkshop.SfxTag": {
-                          "soundId": "123",
-                          "tags": []
-                        }
-                      }
-                    ]
+                    "tags": []
                   }
                 }
               ]
             }
           }
         ],
-        "id": "TestEntity"
+        "id": "TestDice"
       }
     ]
   }
