@@ -1,6 +1,6 @@
 using System;
 
-namespace GameData
+namespace GrishaGuWorkshop
 {
     [Serializable]
     public class DataEntityTag

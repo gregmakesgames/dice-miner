@@ -1,25 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace GameData
+namespace GrishaGuWorkshop
 {
     public class GameDataRegistry
     {
         private const string DataResourcePath = "GameData/data";
 
-        private readonly Dictionary<Type, Dictionary<string, DataEntity>> entitiesByType = new();
-        private readonly Dictionary<Type, IList> orderedEntitiesByType = new();
-
+        private List<DataEntity> _entities = new();
+        
         private bool isLoaded;
-
-        public GameDataRegistry()
-        {
-            Load();
-        }
 
         public void Load(bool forceReload = false)
         {
@@ -28,8 +23,7 @@ namespace GameData
                 return;
             }
 
-            entitiesByType.Clear();
-            orderedEntitiesByType.Clear();
+            _entities.Clear();
 
             LoadData();
             isLoaded = true;
@@ -37,35 +31,30 @@ namespace GameData
 
         public T Get<T>(string id) where T : DataEntity
         {
-            return GetById(typeof(T), id) as T;
+            Load();
+            
+            return _entities.OfType<T>().FirstOrDefault(x => x.Id == id);
         }
 
-        public IReadOnlyList<T> GetAll<T>() where T : DataEntity
+        public List<T> GetAll<T>() where T : DataEntity
         {
             Load();
-            if (orderedEntitiesByType.TryGetValue(typeof(T), out IList list) &&
-                list is List<T> typed)
-            {
-                return typed;
-            }
-
-            return Array.Empty<T>();
+            return _entities.OfType<T>().ToList();
         }
 
-        public DataEntity GetById(Type type, string id)
+
+        public List<DataEntity> GetAllWithTag<TG>() where TG : DataEntityTag
         {
             Load();
-            if (type == null || string.IsNullOrWhiteSpace(id))
-            {
-                return null;
-            }
-
-            return entitiesByType.TryGetValue(type, out Dictionary<string, DataEntity> byId) &&
-                   byId.TryGetValue(id, out DataEntity entity)
-                ? entity
-                : null;
+            return _entities.Where(x => x.GetTag<TG>() != null).ToList();
         }
 
+        public List<T> GetAllOfTypeWithTag<T, TG>() where TG : DataEntityTag where T : DataEntity
+        {
+            Load();
+            return _entities.OfType<T>().Where(x => x.GetTag<TG>() != null).ToList();
+        }
+        
         private void LoadData()
         {
             TextAsset dataAsset = Resources.Load<TextAsset>(DataResourcePath);
@@ -95,9 +84,12 @@ namespace GameData
 
             JsonSerializer serializer = JsonSerializer.CreateDefault();
 
+            var allTypes = typeof(DataEntity).Assembly.GetTypes().Where(x => x.IsAssignableFrom(typeof(DataEntity))).ToList();
+            
             foreach ((string typeName, JToken token) in configs)
             {
-                if (!GameDataTypes.Map.TryGetValue(typeName, out Type type))
+                var type = allTypes.FirstOrDefault(x => x.Name == typeName);
+                if (type == null)
                 {
                     Debug.LogWarning(
                         $"GameData type '{typeName}' is not in the generated type map. " +
@@ -110,11 +102,6 @@ namespace GameData
                     Debug.LogWarning($"GameData type '{typeName}' must be an array.");
                     continue;
                 }
-
-                Dictionary<string, DataEntity> byId = new(StringComparer.Ordinal);
-                IList ordered = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
-                entitiesByType[type] = byId;
-                orderedEntitiesByType[type] = ordered;
 
                 for (int i = 0; i < array.Count; i++)
                 {
@@ -149,8 +136,7 @@ namespace GameData
                         continue;
                     }
 
-                    byId[entity.Id] = entity;
-                    ordered.Add(entity);
+                    _entities.Add(entity);
                 }
             }
         }
