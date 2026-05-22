@@ -3,7 +3,7 @@ using System;
 namespace GrishaGuWorkshop
 {
     [Serializable]
-    public class DataEntityTag
+    public abstract class DataEntityTag
     {
         
     }
