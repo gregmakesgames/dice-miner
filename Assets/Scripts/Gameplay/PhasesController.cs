@@ -1,9 +1,10 @@
 using DiceMiner.Gameplay.Actions;
+using GrishaGuWorkshop;
 using UnityEngine;
 
 namespace DiceMiner.Gameplay
 {
-    public class PhasesController : MonoBehaviour
+    public class PhasesController
     {
         public enum Phases
         {
@@ -37,11 +38,6 @@ namespace DiceMiner.Gameplay
         {
             // Check winning conditions
             
-            
-        }
-
-        private void Update()
-        {
             
         }
     }

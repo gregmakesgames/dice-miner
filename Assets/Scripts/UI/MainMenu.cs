@@ -1,6 +1,7 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DiceMiner.Gameplay;
+using GrishaGuWorkshop;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,17 +23,16 @@ namespace DiceMiner.UI
         
         public async void OnNewGameClicked()
         {
-            var savedGame = Game.save.CreateNewGame();
-            await StartWithSave(savedGame);
+            await StartGame(null);
         }
         
         public async void OnLoadGameClicked()
         {
             var savedGame = Game.save.GetSaves().First();
-            await StartWithSave(savedGame);
+            await StartGame(savedGame);
         }
 
-        private async UniTask StartWithSave(SavedGame savedGame)
+        private async UniTask StartGame(SavedGame savedGame)
         {
             await CrossFadeController.StartCrossFade();
             

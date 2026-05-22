@@ -1,6 +1,5 @@
 using DiceMiner.Cheats;
 using DiceMiner.Gameplay;
-using DiceMiner.Save;
 using DiceMiner.UI;
 using DiceMiner.Vfx;
 using GrishaGuWorkshop;
@@ -15,7 +14,7 @@ namespace DiceMiner
         public static AudioManager audio => AudioManager.Instance;
         public static IVfxManager vfx;
         public static ICheatsManager cheats;
-        public static ISaveManager save;
+        public static SaveManager save;
 
         public static void Init()
         {

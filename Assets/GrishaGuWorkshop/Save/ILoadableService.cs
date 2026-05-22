@@ -1,4 +1,4 @@
-namespace DiceMiner.Save
+namespace GrishaGuWorkshop
 {
     public interface ILoadableService
     {

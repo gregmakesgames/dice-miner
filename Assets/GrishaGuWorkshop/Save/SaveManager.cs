@@ -1,19 +1,31 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 
-namespace DiceMiner.Save
+namespace GrishaGuWorkshop
 {
-    public class SaveManager : ISaveManager
+    public class SaveManager
     {
         private const string SAVE_KEY = "game_save_slot";
-
-        private SavedGame _currentSave = null;
         
-        public SavedGame SaveGame()
+        public SavedGame SaveGame(object saveRoot)
         {
-            return _currentSave;
+            var save = SavedGame.New();
+
+            if (saveRoot != null)
+            {
+                foreach (var field in saveRoot.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (field.GetValue(saveRoot) is ISavableService savableService)
+                    {
+                        savableService.SaveTo(save);
+                    }
+                }
+            }
+
+            SaveToPlayerPrefs(save);
+            
+            return save;
         }
 
         public IReadOnlyList<SavedGame> GetSaves()
@@ -28,16 +40,18 @@ namespace DiceMiner.Save
             return list;
         }
 
-        public SavedGame CreateNewGame()
+        public void LoadGame(SavedGame savedGame, object loadRoot)
         {
-            var index = GetSaves().Select(x => x.slot).Max() + 1;
-            var save = SavedGame.New(index);
-            return save;
-        }
-        
-        public void LoadGame(SavedGame savedGame)
-        {
-            _currentSave = savedGame;
+            if (loadRoot != null)
+            {
+                foreach (var field in loadRoot.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (field.GetValue(loadRoot) is ILoadableService savableService)
+                    {
+                        savableService.LoadFrom(savedGame);
+                    }
+                }
+            }
         }
         
         

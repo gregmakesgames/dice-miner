@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DiceMiner.Gameplay
 {
-    public class ActionQueue : MonoBehaviour
+    public class ActionQueue
     {
         public void PerformActionsOfTag<T>() where T : ActionTag
         {
