@@ -7,13 +7,13 @@ namespace GrishaGuWorkshop
 {
     public class ToolsMenu
     {
-        [MenuItem("Dev Tools/Clear Prefs")]
+        [MenuItem("Grisha WSH/Clear Prefs", priority = 200)]
         public static void ClearPrefs()
         {
             PlayerPrefs.DeleteAll();
         }
         
-        [MenuItem("Dev Tools/Set DEV")]
+        [MenuItem("Grisha WSH/Set DEV", priority = 201)]
         public static void SetDev()
         {
             PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup), 
@@ -27,7 +27,7 @@ namespace GrishaGuWorkshop
             });
         }
         
-        [MenuItem("Dev Tools/Set RELEASE")]
+        [MenuItem("Grisha WSH/Set RELEASE", priority = 202)]
         public static void SetRelease()
         {
             PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup),

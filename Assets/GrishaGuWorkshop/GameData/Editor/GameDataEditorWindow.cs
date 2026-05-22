@@ -27,7 +27,7 @@ namespace GrishaGuWorkshop.Editor
         private int _tagFilterIndex;
         private string _search = string.Empty;
 
-        [MenuItem("Dev Tools/Game Data Editor")]
+        [MenuItem("Grisha WSH/Game Data Editor", priority = 1)]
         public static void Open()
         {
             GetWindow<GameDataEditorWindow>("Game Data");
@@ -345,6 +345,7 @@ namespace GrishaGuWorkshop.Editor
         {
             entity.tags ??= new List<DataEntityTag>();
 
+            var removeIndex = -1;
             for (var i = 0; i < entity.tags.Count; i++)
             {
                 var tag = entity.tags[i];
@@ -359,15 +360,19 @@ namespace GrishaGuWorkshop.Editor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Remove", GUILayout.Width(60)))
                 {
-                    entity.tags.RemoveAt(i);
-                    MarkDirty();
-                    break;
+                    removeIndex = i;
                 }
                 EditorGUILayout.EndHorizontal();
 
                 DrawObjectFields(tag);
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.Space(4);
+            }
+
+            if (removeIndex >= 0)
+            {
+                entity.tags.RemoveAt(removeIndex);
+                MarkDirty();
             }
 
             EditorGUILayout.BeginHorizontal();
@@ -516,16 +521,21 @@ namespace GrishaGuWorkshop.Editor
             list ??= new List<string>();
             EditorGUILayout.LabelField(label);
             EditorGUI.indentLevel++;
+            var removeIndex = -1;
             for (var i = 0; i < list.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
                 list[i] = EditorGUILayout.TextField($"[{i}]", list[i]);
                 if (GUILayout.Button("-", GUILayout.Width(22)))
                 {
-                    list.RemoveAt(i);
-                    break;
+                    removeIndex = i;
                 }
                 EditorGUILayout.EndHorizontal();
+            }
+
+            if (removeIndex >= 0)
+            {
+                list.RemoveAt(removeIndex);
             }
 
             if (GUILayout.Button("Add item"))
@@ -542,16 +552,21 @@ namespace GrishaGuWorkshop.Editor
             list ??= new List<int>();
             EditorGUILayout.LabelField(label);
             EditorGUI.indentLevel++;
+            var removeIndex = -1;
             for (var i = 0; i < list.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
                 list[i] = EditorGUILayout.IntField($"[{i}]", list[i]);
                 if (GUILayout.Button("-", GUILayout.Width(22)))
                 {
-                    list.RemoveAt(i);
-                    break;
+                    removeIndex = i;
                 }
                 EditorGUILayout.EndHorizontal();
+            }
+
+            if (removeIndex >= 0)
+            {
+                list.RemoveAt(removeIndex);
             }
 
             if (GUILayout.Button("Add item"))
@@ -694,7 +709,7 @@ namespace GrishaGuWorkshop.Editor
                     array.Add(JObject.FromObject(entity, serializer));
                 }
 
-                configs[entityType.Name] = array;
+                configs[entityType.FullName] = array;
             }
 
             GameDataIO.Save(root);

@@ -1,78 +1,14 @@
 {
   "configs": {
-    "TileType": [
+    "GrishaGuWorkshop.DataEntity": [
       {
-        "id": "earth",
-        "sprite": "Sprites/Tiles/Earth",
-        "healthMin": 1,
-        "healthMax": 6,
-        "hittableLevelMin": 1,
-        "family": "filler"
-      },
-      {
-        "id": "stone",
-        "sprite": "Sprites/Tiles/Stone",
-        "healthMin": 1,
-        "healthMax": 6,
-        "hittableLevelMin": 1,
-        "family": "filler"
-      },
-      {
-        "id": "limestone",
-        "sprite": "Sprites/Tiles/Limestone",
-        "healthMin": 2,
-        "healthMax": 8,
-        "hittableLevelMin": 1,
-        "family": "filler"
-      },
-      {
-        "id": "mossy_wall",
-        "sprite": "Sprites/Tiles/Mossy_Wall",
-        "healthMin": 30,
-        "healthMax": 45,
-        "hittableLevelMin": 2,
-        "family": "wall"
-      },
-      {
-        "id": "stone_wall",
-        "sprite": "Sprites/Tiles/Stone_Wall",
-        "healthMin": 35,
-        "healthMax": 55,
-        "hittableLevelMin": 3,
-        "family": "wall"
-      },
-      {
-        "id": "gold_vein",
-        "sprite": "Sprites/Tiles/Gold_Vein",
-        "healthMin": 40,
-        "healthMax": 60,
-        "hittableLevelMin": 3,
-        "family": ""
-      },
-      {
-        "id": "gold_vein_deep",
-        "sprite": "Sprites/Tiles/Gold_Vein_Deep",
-        "healthMin": 55,
-        "healthMax": 80,
-        "hittableLevelMin": 4,
-        "family": ""
-      },
-      {
-        "id": "obsidian",
-        "sprite": "Sprites/Tiles/Obsidian",
-        "healthMin": 70,
-        "healthMax": 100,
-        "hittableLevelMin": 5,
-        "family": "outline"
+        "tags": [
+          {
+            "DiceMiner.Gameplay.Actions.MainPhaseTag": {}
+          }
+        ],
+        "id": "TestEntity"
       }
-    ],
-    "Upgrade": [],
-    "DiceType": [
-      {
-        "id": "plainDice",
-        "prefab": "Prefabs/Dices/PlainDice"
-      }
-    ],
-    "Level": []
+    ]
   }
 }

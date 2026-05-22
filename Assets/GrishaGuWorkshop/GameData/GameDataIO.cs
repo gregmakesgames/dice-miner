@@ -63,7 +63,7 @@ namespace GrishaGuWorkshop
 
             foreach (var (typeName, token) in configs)
             {
-                var type = allTypes.FirstOrDefault(x => x.Name == typeName);
+                var type = allTypes.FirstOrDefault(x => x.FullName == typeName);
                 if (type == null)
                 {
                     Debug.LogWarning(
