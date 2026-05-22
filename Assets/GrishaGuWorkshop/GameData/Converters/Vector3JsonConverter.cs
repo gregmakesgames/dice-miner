@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace GrishaGuWorkshop.GameData.Converters
+namespace GrishaGuWorkshop.Converters
 {
     public sealed class Vector3JsonConverter : JsonConverter<Vector3>
     {
