@@ -4,7 +4,10 @@
       {
         "tags": [
           {
-            "DiceMiner.Gameplay.Actions.MainPhaseTag": {}
+            "DiceMiner.Gameplay.Actions.ActionTriggerTag": {
+              "trigger": 1,
+              "tags": []
+            }
           }
         ],
         "id": "TestEntity"

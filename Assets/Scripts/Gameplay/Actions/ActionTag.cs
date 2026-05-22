@@ -3,13 +3,13 @@ using GrishaGuWorkshop;
 
 namespace DiceMiner.Gameplay.Actions
 {
-    public class ActionTag : DataEntityTag
+    public abstract class ActionTag : DataEntityTag
     {
         
     }
 
     public abstract class ActionTagProcessor
     {
-        public abstract UniTask Process();
+        public abstract UniTask Process(FieldEntity actor, ActionTag actorTag);
     }
 }

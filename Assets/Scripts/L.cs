@@ -19,6 +19,8 @@ namespace DiceMiner
         
         private static void EnsureInited()
         {
+            if (_isInitialized) return;
+            
             _transactionConfigReader = new LocalizationConfigReader();
             _transactionConfigReader.ReadLocsfromConfig();
             _translation = new Dictionary<string, string>();

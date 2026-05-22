@@ -18,6 +18,8 @@ namespace GrishaGuWorkshop
 
         private bool initialized = false;
 
+        public new T GetComponent<T>() where T : MonoBehaviour => gameObject.GetComponent<T>();
+        
         public void Initialize()
         {
             if (!initialized)

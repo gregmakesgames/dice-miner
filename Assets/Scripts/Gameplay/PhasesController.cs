@@ -20,7 +20,7 @@ namespace DiceMiner.Gameplay
         private void PreparePhase()
         {
             TurnCount++;
-            Game.run.actionQueue.PerformActionsOfTag<PreparePhaseTag>();
+            Game.run.actionQueue.PerformActionsForTrigger(ActionTriggerTag.TriggerType.PreparePhase);
 
         }
 
@@ -31,7 +31,7 @@ namespace DiceMiner.Gameplay
 
         private void ActivateQueuePhase()
         {
-            Game.run.actionQueue.PerformActionsOfTag<MainPhaseTag>();
+            Game.run.actionQueue.PerformActionsForTrigger(ActionTriggerTag.TriggerType.PreparePhase);
         }
 
         private void EndPhase()

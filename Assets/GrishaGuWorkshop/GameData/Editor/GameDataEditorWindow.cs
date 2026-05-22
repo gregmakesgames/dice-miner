@@ -344,11 +344,15 @@ namespace GrishaGuWorkshop.Editor
         private void DrawTagsSection(DataEntity entity)
         {
             entity.tags ??= new List<DataEntityTag>();
+            DrawTagList(entity.tags);
+        }
 
+        private void DrawTagList(List<DataEntityTag> tags)
+        {
             var removeIndex = -1;
-            for (var i = 0; i < entity.tags.Count; i++)
+            for (var i = 0; i < tags.Count; i++)
             {
-                var tag = entity.tags[i];
+                var tag = tags[i];
                 if (tag == null)
                 {
                     continue;
@@ -365,13 +369,21 @@ namespace GrishaGuWorkshop.Editor
                 EditorGUILayout.EndHorizontal();
 
                 DrawObjectFields(tag);
+
+                tag.tags ??= new List<DataEntityTag>();
+                EditorGUILayout.Space(2);
+                EditorGUILayout.LabelField("Nested tags", EditorStyles.miniBoldLabel);
+                EditorGUI.indentLevel++;
+                DrawTagList(tag.tags);
+                EditorGUI.indentLevel--;
+
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.Space(4);
             }
 
             if (removeIndex >= 0)
             {
-                entity.tags.RemoveAt(removeIndex);
+                tags.RemoveAt(removeIndex);
                 MarkDirty();
             }
 
@@ -379,7 +391,7 @@ namespace GrishaGuWorkshop.Editor
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("+ Add tag", GUILayout.Width(80)))
             {
-                ShowAddTagMenu(entity);
+                ShowAddTagMenu(tags);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -642,21 +654,20 @@ namespace GrishaGuWorkshop.Editor
             MarkDirty();
         }
 
-        private void ShowAddTagMenu(DataEntity entity)
+        private void ShowAddTagMenu(List<DataEntityTag> tags)
         {
-            entity.tags ??= new List<DataEntityTag>();
             var menu = new GenericMenu();
             var hasItems = false;
 
             foreach (var tagType in _tagTypes)
             {
-                if (entity.tags.Any(t => tagType.IsInstanceOfType(t)))
+                if (tags.Any(t => tagType.IsInstanceOfType(t)))
                 {
                     continue;
                 }
 
                 hasItems = true;
-                menu.AddItem(new GUIContent(tagType.Name), false, () => AddTag(entity, tagType));
+                menu.AddItem(new GUIContent(tagType.Name), false, () => AddTag(tags, tagType));
             }
 
             if (!hasItems)
@@ -667,11 +678,10 @@ namespace GrishaGuWorkshop.Editor
             menu.ShowAsContext();
         }
 
-        private void AddTag(DataEntity entity, Type tagType)
+        private void AddTag(List<DataEntityTag> tags, Type tagType)
         {
-            entity.tags ??= new List<DataEntityTag>();
             var tag = (DataEntityTag)Activator.CreateInstance(tagType);
-            entity.tags.Add(tag);
+            tags.Add(tag);
             MarkDirty();
         }
 
@@ -697,22 +707,7 @@ namespace GrishaGuWorkshop.Editor
                 return;
             }
 
-            var root = GameDataIO.LoadDataRoot();
-            var configs = GameDataIO.GetConfigsObject(root);
-            var serializer = GameDataIO.CreateSerializer();
-
-            foreach (var entityType in _entityTypes)
-            {
-                var array = new JArray();
-                foreach (var entity in _entities.Where(e => e.GetType() == entityType))
-                {
-                    array.Add(JObject.FromObject(entity, serializer));
-                }
-
-                configs[entityType.FullName] = array;
-            }
-
-            GameDataIO.Save(root);
+            GameDataIO.SaveEntities(_entities);
             _isDirty = false;
             Debug.Log("Game data saved.");
         }

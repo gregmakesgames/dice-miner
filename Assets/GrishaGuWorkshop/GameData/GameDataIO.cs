@@ -147,6 +147,27 @@ namespace GrishaGuWorkshop
 
             AssetDatabase.Refresh();
         }
+
+        public static void SaveEntities(IEnumerable<DataEntity> entities)
+        {
+            var root = LoadDataRoot();
+            var configs = GetConfigsObject(root);
+            var serializer = CreateSerializer();
+            var entityList = entities as IList<DataEntity> ?? entities.ToList();
+
+            foreach (var entityType in GetDataEntityTypes())
+            {
+                var array = new JArray();
+                foreach (var entity in entityList.Where(e => e.GetType() == entityType))
+                {
+                    array.Add(JObject.FromObject(entity, serializer));
+                }
+
+                configs[entityType.FullName] = array;
+            }
+
+            Save(root);
+        }
 #endif
 
         public static JObject GetConfigsObject(JObject dataRoot)
