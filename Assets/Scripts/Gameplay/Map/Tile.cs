@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using GameData;
+using GrishaGuWorkshop;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,26 +12,27 @@ namespace DiceMiner.Gameplay.Map
         [SerializeField] private Text healthLabel;
         [SerializeField] private GameObject healthContainer;
 
-        public TileTypeData Config { get; private set; }
+        public DataEntity Config { get; private set; }
         public int Health { get; private set; }
         public int MaxHealth { get; private set; }
         public int HittableLevelMin { get; private set; }
         public bool IsHittable => HittableLevelMin <= 1;
         public bool IsDestroyed => MaxHealth > 0 && Health <= 0;
 
-        public void Init(TileTypeData tileConfig, Vector2Int position, int health)
+        public void Init(DataEntity tileConfig, Vector2Int position, int health)
         {
             Position = position;
             Config = tileConfig;
             MaxHealth = Mathf.Max(0, health);
             Health = MaxHealth;
-            HittableLevelMin = tileConfig != null ? Mathf.Max(1, tileConfig.HittableLevelMin) : 1;
+            HittableLevelMin = 1;
 
             UpdateHealthUI();
 
             if (tileImage != null)
             {
-                tileImage.sprite = tileConfig != null ? tileConfig.Sprite : null;
+                // TODO: move this logics to FieldEntity
+                //tileImage.sprite = tileConfig != null ? tileConfig.Sprite : null;
             }
         }
 
@@ -68,8 +69,6 @@ namespace DiceMiner.Gameplay.Map
 
         private void HandleDestroyed()
         {
-            VisualMessageBroker.TryVisualize(this, VisualMessageType.TileDestroyed);
-
             Dispose();
         }
 

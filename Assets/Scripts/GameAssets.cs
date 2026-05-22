@@ -1,4 +1,4 @@
-using GameData;
+using GrishaGuWorkshop;
 
 namespace DiceMiner
 {

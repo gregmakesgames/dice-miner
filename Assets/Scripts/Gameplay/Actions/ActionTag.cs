@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using GameData;
+using GrishaGuWorkshop;
 
 namespace DiceMiner.Gameplay.Actions
 {
