@@ -131,8 +131,7 @@ namespace GrishaGuWorkshop
                 {
                     new ColorJsonConverter(),
                     new Vector2JsonConverter(),
-                    new Vector3JsonConverter(),
-                    new DataEntityTagJsonConverter()
+                    new Vector3JsonConverter()
                 }
             };
         }

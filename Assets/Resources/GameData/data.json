@@ -6,7 +6,21 @@
           {
             "DiceMiner.Gameplay.Actions.ActionTriggerTag": {
               "trigger": 1,
-              "tags": []
+              "tags": [
+                {
+                  "DiceMiner.Gameplay.Actions.SimpleDamageActionTag": {
+                    "damage": 1,
+                    "tags": [
+                      {
+                        "GrishaGuWorkshop.SfxTag": {
+                          "soundId": "123",
+                          "tags": []
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           }
         ],

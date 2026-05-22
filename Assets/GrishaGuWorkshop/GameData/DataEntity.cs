@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GrishaGuWorkshop.Converters;
 using Newtonsoft.Json;
 
 namespace GrishaGuWorkshop
@@ -9,6 +10,7 @@ namespace GrishaGuWorkshop
         [JsonProperty("id")]
         public string Id { get; set; } = string.Empty;
 
+        [JsonProperty(ItemConverterType = typeof(DataEntityTagJsonConverter))]
         public List<DataEntityTag> tags = new();
 
         public bool HasTag<T>() where T : DataEntityTag

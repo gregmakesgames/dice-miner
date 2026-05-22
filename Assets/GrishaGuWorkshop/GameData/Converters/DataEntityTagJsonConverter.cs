@@ -8,15 +8,6 @@ namespace GrishaGuWorkshop.Converters
 {
     public sealed class DataEntityTagJsonConverter : JsonConverter<DataEntityTag>
     {
-        [ThreadStatic]
-        private static bool isReading;
-
-        [ThreadStatic]
-        private static bool isWriting;
-
-        public override bool CanRead => !isReading;
-        public override bool CanWrite => !isWriting;
-
         public override DataEntityTag ReadJson(
             JsonReader reader,
             Type objectType,
@@ -29,7 +20,7 @@ namespace GrishaGuWorkshop.Converters
                 return null;
             }
 
-            JObject wrapper = JObject.Load(reader);
+            var wrapper = JObject.Load(reader);
             if (wrapper.Count != 1)
             {
                 Debug.LogWarning(
@@ -37,23 +28,15 @@ namespace GrishaGuWorkshop.Converters
                 return null;
             }
 
-            JProperty prop = wrapper.Properties().First();
-            Type resolvedType = ResolveTagType(prop.Name);
+            var prop = wrapper.Properties().First();
+            var resolvedType = ResolveTagType(prop.Name);
             if (resolvedType == null)
             {
                 Debug.LogWarning($"DataEntityTag type '{prop.Name}' could not be resolved. Skipped.");
                 return null;
             }
 
-            isReading = true;
-            try
-            {
-                return (DataEntityTag)prop.Value.ToObject(resolvedType, serializer);
-            }
-            finally
-            {
-                isReading = false;
-            }
+            return (DataEntityTag)prop.Value.ToObject(resolvedType, serializer);
         }
 
         public override void WriteJson(JsonWriter writer, DataEntityTag value, JsonSerializer serializer)
@@ -67,16 +50,7 @@ namespace GrishaGuWorkshop.Converters
             var type = value.GetType();
             writer.WriteStartObject();
             writer.WritePropertyName(type.FullName);
-            isWriting = true;
-            try
-            {
-                serializer.Serialize(writer, value, type);
-            }
-            finally
-            {
-                isWriting = false;
-            }
-
+            serializer.Serialize(writer, value, type);
             writer.WriteEndObject();
         }
 
